@@ -7,6 +7,7 @@ import productRoutes from './routes/products';
 import campaignRoutes from './routes/campaigns';
 import linkRoutes from './routes/links';
 import redirectRoutes from './routes/redirect';
+import analyticsRoutes from './routes/analytics';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/products', productRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/links', linkRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/go', redirectRoutes);
 
 app.use(errorHandler);
