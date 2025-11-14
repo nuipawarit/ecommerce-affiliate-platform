@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { errorHandler } from './middleware/error-handler';
 
 const app = express();
 
@@ -27,5 +28,7 @@ app.get('/api/health', (req, res) => {
     uptime: process.uptime()
   });
 });
+
+app.use(errorHandler);
 
 export { app };
