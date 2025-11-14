@@ -12,6 +12,8 @@
     "test": "bun test"
   },
   "dependencies": {
+    "@repo/adapters": "*",
+    "@repo/database": "*",
     "@scalar/express-api-reference": "^0.8.24",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

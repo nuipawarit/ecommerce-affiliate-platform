@@ -1,17 +1,12 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { ErrorRequestHandler } from 'express';
 import { MarketplaceError } from '@repo/adapters';
 import { Prisma } from '@prisma/client';
 
-export function errorHandler(
-  error: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
   console.error('Error:', error);
 
   if (error instanceof MarketplaceError) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       error: {
         code: 'MARKETPLACE_ERROR',
@@ -19,11 +14,12 @@ export function errorHandler(
         marketplace: error.marketplace
       }
     });
+    return;
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === 'P2002') {
-      return res.status(409).json({
+      res.status(409).json({
         success: false,
         error: {
           code: 'DUPLICATE_ERROR',
@@ -31,27 +27,30 @@ export function errorHandler(
           field: error.meta?.target
         }
       });
+      return;
     }
 
     if (error.code === 'P2025') {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: {
           code: 'NOT_FOUND',
           message: 'Record not found'
         }
       });
+      return;
     }
   }
 
   if (error.name === 'NotFoundError') {
-    return res.status(404).json({
+    res.status(404).json({
       success: false,
       error: {
         code: 'NOT_FOUND',
         message: error.message || 'Resource not found'
       }
     });
+    return;
   }
 
   res.status(500).json({
