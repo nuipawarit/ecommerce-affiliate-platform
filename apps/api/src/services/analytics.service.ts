@@ -358,4 +358,18 @@ export class AnalyticsService {
 
     return result;
   }
+
+  async getDashboard(filters?: DashboardQueryParams) {
+    const limit = filters?.limit || 10;
+
+    const [overview, topProducts] = await Promise.all([
+      this.getOverview(filters),
+      this.getTopProducts(limit),
+    ]);
+
+    return {
+      ...overview,
+      topProducts,
+    };
+  }
 }

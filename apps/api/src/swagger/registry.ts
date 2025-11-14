@@ -485,6 +485,28 @@ registry.registerPath({
 
 registry.registerPath({
   method: "get",
+  path: "/api/analytics/dashboard",
+  summary: "Get comprehensive dashboard",
+  description:
+    "Retrieve comprehensive dashboard with overview stats, top campaigns, and top products. Combines overview and product analytics in a single response.",
+  tags: ["Analytics"],
+  request: {
+    query: dashboardQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Dashboard data retrieved successfully",
+      content: {
+        "application/json": {
+          schema: successResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
   path: "/api/analytics/overview",
   summary: "Get analytics overview",
   description:
@@ -557,7 +579,7 @@ registry.registerPath({
 
 registry.registerPath({
   method: "get",
-  path: "/{shortCode}",
+  path: "/go/{shortCode}",
   summary: "Redirect short link",
   description: "Redirect to target URL and track click analytics",
   tags: ["Redirect"],

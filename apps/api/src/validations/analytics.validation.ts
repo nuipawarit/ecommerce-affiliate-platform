@@ -17,6 +17,17 @@ export const dashboardQuerySchema = z
         description: "Date range for analytics data",
         example: "last30days",
       }),
+    limit: z
+      .string()
+      .optional()
+      .transform((val) => (val ? parseInt(val, 10) : 10))
+      .refine((val) => val > 0 && val <= 50, {
+        message: "Limit must be between 1 and 50",
+      })
+      .openapi({
+        description: "Limit number of top items (campaigns and products)",
+        example: "10",
+      }),
   })
   .openapi("DashboardQueryParams");
 

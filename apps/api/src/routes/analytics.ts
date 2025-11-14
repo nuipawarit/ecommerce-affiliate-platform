@@ -17,6 +17,17 @@ const router = Router();
 const analyticsService = new AnalyticsService();
 
 router.get(
+  "/dashboard",
+  validateQuery(dashboardQuerySchema),
+  asyncHandler(async (req, res) => {
+    const filters = req.query as unknown as DashboardQueryParams;
+    const dashboard = await analyticsService.getDashboard(filters);
+
+    res.json(successResponse(dashboard));
+  })
+);
+
+router.get(
   "/overview",
   validateQuery(dashboardQuerySchema),
   asyncHandler(async (req, res) => {
