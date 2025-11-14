@@ -8,6 +8,7 @@ import campaignRoutes from './routes/campaigns';
 import linkRoutes from './routes/links';
 import redirectRoutes from './routes/redirect';
 import analyticsRoutes from './routes/analytics';
+import docsRoutes from './routes/docs';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/links', linkRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/docs', docsRoutes);
 app.use('/go', redirectRoutes);
 
 app.use(errorHandler);
