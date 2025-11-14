@@ -34,7 +34,7 @@ export const updateCampaignSchema = z.object({
 });
 
 export const campaignIdSchema = z.object({
-  id: z.string().cuid("Invalid campaign ID format"),
+  id: z.cuid("Invalid campaign ID format"),
 });
 
 export const campaignSlugSchema = z.object({

@@ -53,6 +53,17 @@ export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
     return;
   }
 
+  if (error.name === 'BadRequestError') {
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'BAD_REQUEST',
+        message: error.message || 'Bad request'
+      }
+    });
+    return;
+  }
+
   res.status(500).json({
     success: false,
     error: {
@@ -68,5 +79,12 @@ export class NotFoundError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'NotFoundError';
+  }
+}
+
+export class BadRequestError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'BadRequestError';
   }
 }
