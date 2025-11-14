@@ -9,3 +9,6 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+export type { Product, Offer, Campaign, Link, Click } from '@prisma/client';
+export { Marketplace } from '@prisma/client';

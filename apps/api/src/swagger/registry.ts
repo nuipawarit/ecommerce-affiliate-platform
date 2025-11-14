@@ -639,6 +639,25 @@ registry.registerPath({
   },
 });
 
+registry.registerPath({
+  method: "get",
+  path: "/api/jobs/status",
+  summary: "Get background job status",
+  description:
+    "Retrieve execution status and metrics for the price refresh background job, including last run time, duration, and processing statistics",
+  tags: ["Jobs"],
+  responses: {
+    200: {
+      description: "Job status retrieved successfully",
+      content: {
+        "application/json": {
+          schema: successResponseSchema,
+        },
+      },
+    },
+  },
+});
+
 const generator = new OpenApiGeneratorV3(registry.definitions);
 
 export const openApiSpec = generator.generateDocument({
@@ -683,6 +702,10 @@ export const openApiSpec = generator.generateDocument({
     {
       name: "Redirect",
       description: "Short link redirection with tracking",
+    },
+    {
+      name: "Jobs",
+      description: "Background job status and monitoring",
     },
   ],
 });
