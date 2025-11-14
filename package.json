@@ -1,20 +1,29 @@
 {
   "name": "ecommerce-affiliate-platform",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
     "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
     "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "db:generate": "bun --filter database run db:generate",
+    "db:push": "bun --filter database run db:push",
+    "db:studio": "bun --filter database run db:studio",
+    "db:seed": "bun --filter database run db:seed",
+    "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
     "turbo": "^2.6.1",
-    "typescript": "5.9.2"
+    "typescript": "^5.7.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "bun": ">=1.0.0"
   },
   "packageManager": "bun@1.2.21",
   "workspaces": [
