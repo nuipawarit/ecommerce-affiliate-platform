@@ -222,4 +222,21 @@ export class CampaignService {
 
     return campaign;
   }
+
+  async deleteCampaign(id: string) {
+    const campaign = await prisma.campaign.findUnique({
+      where: { id },
+    });
+
+    if (!campaign) {
+      throw new NotFoundError(`Campaign with id ${id} not found`);
+    }
+
+    const updatedCampaign = await prisma.campaign.update({
+      where: { id },
+      data: { status: CampaignStatus.ARCHIVED },
+    });
+
+    return updatedCampaign;
+  }
 }

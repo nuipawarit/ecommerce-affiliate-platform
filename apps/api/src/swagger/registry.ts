@@ -421,6 +421,44 @@ registry.registerPath({
 });
 
 registry.registerPath({
+  method: "delete",
+  path: "/api/campaigns/{id}",
+  summary: "Delete campaign",
+  description: "Archive a campaign by setting its status to ARCHIVED (soft delete)",
+  tags: ["Campaigns"],
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    params: campaignIdSchema,
+  },
+  responses: {
+    200: {
+      description: "Campaign archived successfully",
+      content: {
+        "application/json": {
+          schema: successResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    404: {
+      description: "Campaign not found",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
   method: "post",
   path: "/api/links",
   summary: "Create affiliate link",

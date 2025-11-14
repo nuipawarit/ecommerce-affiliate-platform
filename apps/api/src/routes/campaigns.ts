@@ -97,4 +97,16 @@ router.put(
   })
 );
 
+router.delete(
+  "/:id",
+  requireAuth,
+  validateParams(campaignIdSchema),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const campaign = await campaignService.deleteCampaign(id!);
+
+    res.json(successResponse(campaign));
+  })
+);
+
 export default router;

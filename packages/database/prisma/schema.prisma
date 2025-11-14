@@ -17,6 +17,7 @@ enum CampaignStatus {
   ACTIVE
   PAUSED
   ENDED
+  ARCHIVED
 }
 
 model Product {
