@@ -22,6 +22,7 @@ import {
   topProductsQuerySchema,
   campaignIdParamSchema,
 } from "../validations/analytics.validation";
+import { campaignPaginationSchema } from "../validations/common.validation";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import {
   createSuccessResponseSchema,
@@ -277,16 +278,6 @@ registry.registerPath({
       },
     },
   },
-});
-
-const campaignPaginationSchema = paginationSchema.extend({
-  status: z
-    .enum(["DRAFT", "ACTIVE", "PAUSED", "ENDED", "ARCHIVED"])
-    .optional()
-    .openapi({
-      description: "Filter campaigns by status",
-      example: "ACTIVE",
-    }),
 });
 
 registry.registerPath({
