@@ -1,3 +1,5 @@
+import { getAuthToken } from "./auth";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 interface ApiResponse<T> {
@@ -24,7 +26,27 @@ class ApiClientError extends Error {
   }
 }
 
+function getHeaders(): HeadersInit {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  const token = getAuthToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
+}
+
 async function handleResponse<T>(response: Response): Promise<T> {
+  if (response.status === 401) {
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new ApiClientError("Unauthorized", "UNAUTHORIZED", 401);
+  }
+
   if (!response.ok) {
     const error: ApiError = await response.json().catch(() => ({
       success: false,
@@ -45,9 +67,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export async function apiGet<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(),
     cache: "no-store",
   });
 
@@ -60,9 +80,7 @@ export async function apiPost<T, D = unknown>(
 ): Promise<T> {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(),
     body: data ? JSON.stringify(data) : undefined,
   });
 
@@ -75,9 +93,7 @@ export async function apiPut<T, D = unknown>(
 ): Promise<T> {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(),
     body: data ? JSON.stringify(data) : undefined,
   });
 
@@ -87,9 +103,7 @@ export async function apiPut<T, D = unknown>(
 export async function apiDelete<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(),
   });
 
   return handleResponse<T>(response);

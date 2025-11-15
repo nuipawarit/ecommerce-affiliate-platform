@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express';
+import { verifyToken } from '../utils/jwt';
 
 export const requireAuth: RequestHandler = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -14,30 +15,20 @@ export const requireAuth: RequestHandler = (req, res, next) => {
     return;
   }
 
-  const apiKey = authHeader.replace('Bearer ', '').trim();
+  const token = authHeader.replace('Bearer ', '').trim();
 
-  if (!process.env.API_KEY) {
-    console.error('API_KEY environment variable is not set');
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'SERVER_ERROR',
-        message: 'Authentication is not configured'
-      }
-    });
-    return;
-  }
-
-  if (apiKey !== process.env.API_KEY) {
+  try {
+    const decoded = verifyToken(token);
+    (req as any).user = decoded;
+    next();
+  } catch (error) {
     res.status(401).json({
       success: false,
       error: {
         code: 'UNAUTHORIZED',
-        message: 'Invalid API key'
+        message: 'Invalid or expired token'
       }
     });
     return;
   }
-
-  next();
 }

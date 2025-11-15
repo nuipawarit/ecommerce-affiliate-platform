@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LogoutButton } from "@/components/LogoutButton";
 import { useState } from "react";
 
 const navigation = [
@@ -72,8 +73,9 @@ export function AdminSidebar() {
             })}
           </nav>
 
-          <div className="border-t p-4">
-            <p className="text-xs text-muted-foreground">
+          <div className="border-t p-4 space-y-2">
+            <LogoutButton />
+            <p className="text-xs text-muted-foreground text-center">
               Affiliate Platform
             </p>
           </div>

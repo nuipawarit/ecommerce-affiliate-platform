@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { errorHandler } from './middleware/error-handler';
+import authRoutes from './routes/auth';
 import productRoutes from './routes/products';
 import campaignRoutes from './routes/campaigns';
 import linkRoutes from './routes/links';
@@ -36,6 +37,7 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/links', linkRoutes);
