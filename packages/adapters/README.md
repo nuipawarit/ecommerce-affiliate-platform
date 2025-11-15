@@ -243,4 +243,4 @@ This keeps the adapters decoupled from Prisma and allows them to be used in diff
 
 ## License
 
-Private - Part of Jenosize Lead Engineer Assessment
+Private - Affiliate Platform Project
