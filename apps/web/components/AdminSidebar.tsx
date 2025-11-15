@@ -75,9 +75,6 @@ export function AdminSidebar() {
 
           <div className="border-t p-4 space-y-2">
             <LogoutButton />
-            <p className="text-xs text-muted-foreground text-center">
-              Affiliate Platform
-            </p>
           </div>
         </div>
       </aside>
