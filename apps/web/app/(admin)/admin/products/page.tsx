@@ -4,27 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Package, TrendingUp, Store } from "lucide-react";
 import { ProductsTable } from "./components/ProductsTable";
 import { apiGet } from "@/lib/api-client";
+import type { ProductWithCounts, ProductsListResponse } from "@repo/shared";
 
-interface Offer {
-  id: string;
-  marketplace: string;
-  storeName: string;
-  price: number;
-  url: string;
-  lastCheckedAt: string;
-}
-
-interface Product {
-  id: string;
-  title: string;
-  imageUrl: string;
-  createdAt: string;
-  offers: Offer[];
-}
-
-async function getProducts(): Promise<Product[]> {
+async function getProducts(): Promise<ProductWithCounts[]> {
   try {
-    const data = await apiGet<{ products: Product[] }>('/api/products');
+    const data = await apiGet<ProductsListResponse>('/api/products');
     return data.products || [];
   } catch (error) {
     console.error("Error fetching products:", error);
