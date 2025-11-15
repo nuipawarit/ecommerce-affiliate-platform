@@ -1,8 +1,22 @@
 {
-  "name": "shared",
+  "name": "@repo/shared",
+  "version": "0.0.0",
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "exports": {
+    ".": {
+      "import": "./index.ts",
+      "types": "./index.ts"
+    },
+    "./types": {
+      "import": "./src/types/index.ts",
+      "types": "./src/types/index.ts"
+    }
+  },
+  "dependencies": {
+    "@repo/database": "workspace:*"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
