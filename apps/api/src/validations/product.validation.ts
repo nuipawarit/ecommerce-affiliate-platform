@@ -5,9 +5,14 @@ extendZodWithOpenApi(z);
 
 export const createProductSchema = z
   .object({
-    url: z.url("Invalid URL format").openapi({
-      description: "Product URL from Lazada or Shopee marketplace",
+    url: z.url("Invalid URL format").optional().openapi({
+      description:
+        "Product URL from Lazada or Shopee marketplace (required if SKU not provided)",
       example: "https://www.lazada.co.th/products/matcha-powder-i123456.html",
+    }),
+    sku: z.string().min(1, "SKU cannot be empty").optional().openapi({
+      description: "Product SKU code (required if URL not provided)",
+      example: "LAZ123456",
     }),
     marketplace: z
       .enum(["lazada", "shopee"], {
@@ -18,7 +23,28 @@ export const createProductSchema = z
         example: "lazada",
       }),
   })
+  .refine((data) => data.url || data.sku, {
+    message: "Either URL or SKU must be provided",
+    path: ["url"],
+  })
   .openapi("CreateProductRequest");
+
+export const searchProductSchema = z
+  .object({
+    url: z.string().url("Invalid URL format").optional().openapi({
+      description: "Product URL from Lazada or Shopee marketplace",
+      example: "https://www.lazada.co.th/products/matcha-powder-i123456.html",
+    }),
+    sku: z.string().min(1, "SKU cannot be empty").optional().openapi({
+      description: "Product SKU code for search",
+      example: "ABC123",
+    }),
+  })
+  .refine((data) => data.url || data.sku, {
+    message: "Either URL or SKU must be provided",
+    path: ["url"],
+  })
+  .openapi("SearchProductRequest");
 
 export const productIdSchema = z
   .object({
@@ -30,4 +56,5 @@ export const productIdSchema = z
   .openapi("ProductIdParams");
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;
+export type SearchProductInput = z.infer<typeof searchProductSchema>;
 export type ProductIdParams = z.infer<typeof productIdSchema>;

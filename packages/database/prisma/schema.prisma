@@ -42,6 +42,7 @@ model Offer {
   storeName     String
   price         Float
   url           String      @db.Text
+  sku           String?
   isActive      Boolean     @default(true)
   lastCheckedAt DateTime    @default(now())
   createdAt     DateTime    @default(now())
@@ -54,6 +55,7 @@ model Offer {
   @@index([productId])
   @@index([marketplace])
   @@index([productId, price])
+  @@index([sku])
 }
 
 model Campaign {

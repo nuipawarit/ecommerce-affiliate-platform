@@ -22,6 +22,7 @@ interface Offer {
   storeName: string;
   price: number;
   url: string;
+  sku?: string | null;
   lastCheckedAt: string;
 }
 
@@ -76,50 +77,102 @@ export function ProductsTable({ products }: ProductsTableProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Image</TableHead>
+                  <TableHead className="w-[80px]">Image</TableHead>
                   <TableHead>Product</TableHead>
+                  <TableHead>Best Price</TableHead>
+                  <TableHead className="text-center">Marketplaces</TableHead>
                   <TableHead className="text-center">Offers</TableHead>
                   <TableHead className="text-right">Added</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredProducts.map((product) => (
-                  <TableRow key={product.id} className="cursor-pointer">
-                    <TableCell>
-                      <Link href={`/admin/products/${product.id}`}>
-                        <div className="relative h-16 w-16 overflow-hidden rounded-md border">
-                          <Image
-                            src={product.imageUrl}
-                            alt={product.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <Link
-                        href={`/admin/products/${product.id}`}
-                        className="hover:underline"
-                      >
-                        <div className="font-medium">{product.title}</div>
-                        {product.offers.length > 0 && (
-                          <div className="text-sm text-muted-foreground">
-                            {product.offers
-                              .map((o) => o.storeName)
-                              .join(", ")}
+                {filteredProducts.map((product) => {
+                  const lowestPrice =
+                    product.offers.length > 0
+                      ? Math.min(...product.offers.map((o) => o.price))
+                      : null;
+                  const hasLazada = product.offers.some(
+                    (o) => o.marketplace === "LAZADA"
+                  );
+                  const hasShopee = product.offers.some(
+                    (o) => o.marketplace === "SHOPEE"
+                  );
+
+                  return (
+                    <TableRow
+                      key={product.id}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                    >
+                      <TableCell>
+                        <Link href={`/admin/products/${product.id}`}>
+                          <div className="relative h-16 w-16 overflow-hidden rounded-lg border shadow-sm hover:shadow-md transition-shadow">
+                            <Image
+                              src={product.imageUrl}
+                              alt={product.title}
+                              fill
+                              className="object-cover"
+                            />
                           </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/admin/products/${product.id}`}
+                          className="hover:underline block"
+                        >
+                          <div className="font-semibold text-base line-clamp-2">
+                            {product.title}
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        {lowestPrice !== null ? (
+                          <p className="font-bold text-xl text-green-600 whitespace-nowrap">
+                            ฿{lowestPrice.toLocaleString()}
+                          </p>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
                         )}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="secondary">{product.offers.length}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right text-sm text-muted-foreground">
-                      {new Date(product.createdAt).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1.5 justify-center">
+                          {hasLazada && (
+                            <div
+                              className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold shadow-sm"
+                              title="Lazada"
+                            >
+                              L
+                            </div>
+                          )}
+                          {hasShopee && (
+                            <div
+                              className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold shadow-sm"
+                              title="Shopee"
+                            >
+                              S
+                            </div>
+                          )}
+                          {product.offers.length === 0 && (
+                            <span className="text-muted-foreground text-sm">
+                              -
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant="secondary"
+                          className="font-semibold text-sm px-2.5"
+                        >
+                          {product.offers.length}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right text-sm text-muted-foreground whitespace-nowrap">
+                        {new Date(product.createdAt).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

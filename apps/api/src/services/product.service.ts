@@ -20,9 +20,24 @@ export class ProductService {
     return marketplace.toUpperCase() as Marketplace;
   }
 
-  async createFromUrl(url: string, marketplace: 'lazada' | 'shopee') {
+  private detectMarketplace(url: string): 'lazada' | 'shopee' {
+    const lowerUrl = url.toLowerCase();
+    if (lowerUrl.includes('lazada')) return 'lazada';
+    if (lowerUrl.includes('shopee')) return 'shopee';
+    throw new Error('Cannot detect marketplace from URL. URL must contain "lazada" or "shopee"');
+  }
+
+  async create(input: { url?: string; sku?: string; marketplace: 'lazada' | 'shopee' }) {
+    const { url, sku, marketplace } = input;
+
+    if (!url && !sku) {
+      throw new Error('Either URL or SKU must be provided');
+    }
+
     const adapter = this.getAdapter(marketplace);
-    const productData = await adapter.fetchProduct(url);
+    const productData = url
+      ? await adapter.fetchProduct(url)
+      : await adapter.fetchProductBySku(sku!);
 
     const existingProduct = await prisma.product.findFirst({
       where: {
@@ -53,6 +68,7 @@ export class ProductService {
               storeName: productData.storeName,
               price: productData.price,
               url: productData.url,
+              sku: productData.sku,
               isActive: true,
               lastCheckedAt: new Date()
             }
@@ -75,6 +91,7 @@ export class ProductService {
             storeName: productData.storeName,
             price: productData.price,
             url: productData.url,
+            sku: productData.sku,
             isActive: true,
             lastCheckedAt: new Date()
           }
@@ -86,6 +103,43 @@ export class ProductService {
     });
 
     return product;
+  }
+
+  async createFromUrl(url: string, marketplace: 'lazada' | 'shopee') {
+    return this.create({ url, marketplace });
+  }
+
+  async searchProducts(input: { url?: string; sku?: string }) {
+    const { url, sku } = input;
+
+    if (!url && !sku) {
+      throw new Error('Either URL or SKU must be provided');
+    }
+
+    if (url) {
+      const marketplace = this.detectMarketplace(url);
+      const adapter = this.getAdapter(marketplace);
+      try {
+        const product = await adapter.fetchProduct(url);
+        return [product];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    if (sku) {
+      const lazadaAdapter = new LazadaAdapter();
+      const shopeeAdapter = new ShopeeAdapter();
+
+      const [lazadaResults, shopeeResults] = await Promise.all([
+        lazadaAdapter.searchProducts(sku).catch(() => []),
+        shopeeAdapter.searchProducts(sku).catch(() => [])
+      ]);
+
+      return [...lazadaResults, ...shopeeResults];
+    }
+
+    return [];
   }
 
   async getAllProducts(filters?: { page?: number; limit?: number }) {
@@ -215,5 +269,114 @@ export class ProductService {
     });
 
     return refreshedProduct;
+  }
+
+  private calculateSimilarity(str1: string, str2: string): number {
+    const s1 = str1.toLowerCase().trim();
+    const s2 = str2.toLowerCase().trim();
+
+    if (s1 === s2) return 1;
+
+    const longer = s1.length > s2.length ? s1 : s2;
+    const shorter = s1.length > s2.length ? s2 : s1;
+
+    if (longer.length === 0) return 1;
+
+    const editDistance = this.levenshteinDistance(longer, shorter);
+    return (longer.length - editDistance) / longer.length;
+  }
+
+  private levenshteinDistance(str1: string, str2: string): number {
+    const matrix: number[][] = [];
+
+    for (let i = 0; i <= str2.length; i++) {
+      matrix[i] = [i];
+    }
+
+    for (let j = 0; j <= str1.length; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+
+    return matrix[str2.length][str1.length];
+  }
+
+  async findSimilarProducts(title: string, threshold: number = 0.8) {
+    const allProducts = await prisma.product.findMany({
+      include: {
+        offers: {
+          orderBy: { price: 'asc' }
+        }
+      }
+    });
+
+    const similarProducts = allProducts
+      .map(product => ({
+        product,
+        similarity: this.calculateSimilarity(title, product.title)
+      }))
+      .filter(item => item.similarity >= threshold)
+      .sort((a, b) => b.similarity - a.similarity);
+
+    return similarProducts.map(item => item.product);
+  }
+
+  async addOfferToProduct(productId: string, input: { url: string; marketplace: 'lazada' | 'shopee' }) {
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { offers: true }
+    });
+
+    if (!product) {
+      throw new NotFoundError(`Product with id ${productId} not found`);
+    }
+
+    const adapter = this.getAdapter(input.marketplace);
+    const productData = await adapter.fetchProduct(input.url);
+
+    const existingOffer = product.offers.find(
+      offer => offer.marketplace === this.mapMarketplaceToEnum(input.marketplace) && offer.url === input.url
+    );
+
+    if (existingOffer) {
+      return product;
+    }
+
+    const updatedProduct = await prisma.product.update({
+      where: { id: productId },
+      data: {
+        offers: {
+          create: {
+            marketplace: this.mapMarketplaceToEnum(productData.marketplace),
+            storeName: productData.storeName,
+            price: productData.price,
+            url: productData.url,
+            sku: productData.sku,
+            isActive: true,
+            lastCheckedAt: new Date()
+          }
+        }
+      },
+      include: {
+        offers: {
+          orderBy: { price: 'asc' }
+        }
+      }
+    });
+
+    return updatedProduct;
   }
 }

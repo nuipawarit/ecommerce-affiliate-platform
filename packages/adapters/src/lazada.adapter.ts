@@ -26,12 +26,26 @@ export class LazadaAdapter implements IMarketplaceAdapter {
     }
   }
 
+  async fetchProductBySku(sku: string): Promise<MarketplaceProduct> {
+    if (!sku || sku.trim() === '') {
+      throw new Error('SKU is required');
+    }
+
+    const mockUrl = `https://www.lazada.co.th/products/product-${sku.toLowerCase()}-i${Date.now()}.html`;
+    const product = generateMockProduct('lazada', sku, mockUrl);
+
+    return product;
+  }
+
   async searchProducts(keyword: string): Promise<MarketplaceProduct[]> {
     if (!keyword || keyword.trim() === '') {
       return [];
     }
 
     const results = searchMockProducts('lazada', keyword);
-    return results;
+    return results.map(result => ({
+      ...result,
+      url: result.url || `https://www.lazada.co.th/products/product-${keyword.toLowerCase()}-i${Date.now()}.html`
+    }));
   }
 }

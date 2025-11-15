@@ -27,12 +27,29 @@ export class ShopeeAdapter implements IMarketplaceAdapter {
     }
   }
 
+  async fetchProductBySku(sku: string): Promise<MarketplaceProduct> {
+    if (!sku || sku.trim() === '') {
+      throw new Error('SKU is required');
+    }
+
+    const mockShopId = Math.floor(Math.random() * 100000);
+    const mockItemId = Math.floor(Math.random() * 1000000);
+    const mockUrl = `https://shopee.co.th/product-${sku.toLowerCase()}.${mockShopId}.${mockItemId}`;
+    const product = generateMockProduct('shopee', sku, mockUrl);
+
+    return product;
+  }
+
   async searchProducts(keyword: string): Promise<MarketplaceProduct[]> {
     if (!keyword || keyword.trim() === '') {
       return [];
     }
 
     const results = searchMockProducts('shopee', keyword);
-    return results;
+    const mockShopId = Math.floor(Math.random() * 100000);
+    return results.map(result => ({
+      ...result,
+      url: result.url || `https://shopee.co.th/product-${keyword.toLowerCase()}.${mockShopId}.${Date.now()}`
+    }));
   }
 }
