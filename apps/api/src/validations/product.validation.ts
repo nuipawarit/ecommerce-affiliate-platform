@@ -55,6 +55,43 @@ export const productIdSchema = z
   })
   .openapi("ProductIdParams");
 
+export const addOfferSchema = z
+  .object({
+    url: z.string().url("Invalid URL format").openapi({
+      description: "Offer URL from marketplace",
+      example: "https://shopee.co.th/product.123456.789",
+    }),
+    marketplace: z
+      .enum(["lazada", "shopee"], {
+        message: 'Marketplace must be either "lazada" or "shopee"',
+      })
+      .openapi({
+        description: "Marketplace platform name",
+        example: "shopee",
+      }),
+  })
+  .openapi("AddOfferRequest");
+
+export const checkSimilarSchema = z
+  .object({
+    title: z.string().min(1, "Title is required").openapi({
+      description: "Product title to search for similar products",
+      example: "Matcha Green Tea Powder",
+    }),
+    threshold: z
+      .number()
+      .min(0)
+      .max(1)
+      .optional()
+      .openapi({
+        description: "Similarity threshold (0-1). Default: 0.8",
+        example: 0.8,
+      }),
+  })
+  .openapi("CheckSimilarRequest");
+
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type SearchProductInput = z.infer<typeof searchProductSchema>;
 export type ProductIdParams = z.infer<typeof productIdSchema>;
+export type AddOfferInput = z.infer<typeof addOfferSchema>;
+export type CheckSimilarInput = z.infer<typeof checkSimilarSchema>;

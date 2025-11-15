@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CampaignStatus } from "@prisma/client";
+import { CampaignStatus } from "@repo/shared";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 
 extendZodWithOpenApi(z);
@@ -68,7 +68,7 @@ export const updateCampaignSchema = z
     utmMedium: z.string().optional(),
     utmContent: z.string().optional(),
     utmTerm: z.string().optional(),
-    status: z.enum(CampaignStatus).optional(),
+    status: z.enum([CampaignStatus.DRAFT, CampaignStatus.ACTIVE, CampaignStatus.PAUSED, CampaignStatus.ENDED] as const).optional(),
     startAt: z.iso.datetime().optional(),
     endAt: z.iso.datetime().optional(),
   })

@@ -13,24 +13,14 @@ import {
   campaignIdSchema,
   campaignSlugSchema,
 } from "../validations/campaign.validation";
+import {
+  campaignPaginationSchema,
+  type CampaignPaginationQuery,
+} from "../validations/common.validation";
 import { successResponse } from "../utils/response";
-import { z } from "zod";
-import { CampaignStatus } from "@prisma/client";
 
 const router = Router();
 const campaignService = new CampaignService();
-
-const paginationSchema = z.object({
-  page: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : undefined)),
-  limit: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : undefined)),
-  status: z.enum(CampaignStatus).optional(),
-});
 
 router.post(
   "/",
@@ -45,13 +35,9 @@ router.post(
 
 router.get(
   "/",
-  validateQuery(paginationSchema),
+  validateQuery(campaignPaginationSchema),
   asyncHandler(async (req, res) => {
-    const { page, limit, status } = req.query as {
-      page?: number;
-      limit?: number;
-      status?: CampaignStatus;
-    };
+    const { page, limit, status } = req.query as CampaignPaginationQuery;
     const result = await campaignService.getAllCampaigns({
       page,
       limit,
@@ -69,7 +55,7 @@ router.get(
     const { id } = req.params;
     const campaign = await campaignService.getCampaignById(id!);
 
-    res.json(successResponse(campaign));
+    res.json(successResponse({ campaign }));
   })
 );
 
@@ -80,7 +66,7 @@ router.get(
     const { slug } = req.params;
     const campaign = await campaignService.getCampaignBySlug(slug!);
 
-    res.json(successResponse(campaign));
+    res.json(successResponse({ campaign }));
   })
 );
 

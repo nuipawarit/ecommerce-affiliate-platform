@@ -23,38 +23,27 @@ import {
   campaignIdParamSchema,
 } from "../validations/analytics.validation";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+import {
+  createSuccessResponseSchema,
+  paginationSchema,
+  productsListResponseSchema,
+  productDetailResponseSchema,
+  productOffersResponseSchema,
+  searchProductsResponseSchema,
+  campaignsListResponseSchema,
+  campaignDetailResponseSchema,
+  linksListResponseSchema,
+  linkDetailResponseSchema,
+  dashboardResponseSchema,
+  analyticsOverviewSchema,
+  topProductsResponseSchema,
+  campaignAnalyticsSchema,
+  jobStatusResponseSchema,
+} from "./schemas";
 
 extendZodWithOpenApi(z);
 
 const registry = new OpenAPIRegistry();
-
-const paginationSchema = z
-  .object({
-    page: z
-      .string()
-      .optional()
-      .transform((val) => (val ? parseInt(val, 10) : undefined))
-      .openapi({
-        description: "Page number for pagination",
-        example: "1",
-      }),
-    limit: z
-      .string()
-      .optional()
-      .transform((val) => (val ? parseInt(val, 10) : undefined))
-      .openapi({
-        description: "Number of items per page",
-        example: "20",
-      }),
-  })
-  .openapi("PaginationParams");
-
-const successResponseSchema = z
-  .object({
-    success: z.boolean().openapi({ example: true }),
-    data: z.any(),
-  })
-  .openapi("SuccessResponse");
 
 const errorResponseSchema = z
   .object({
@@ -93,7 +82,10 @@ registry.registerPath({
       description: "Product created successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            productDetailResponseSchema,
+            "CreateProductSuccessResponse"
+          ),
         },
       },
     },
@@ -122,15 +114,15 @@ registry.registerPath({
   summary: "List all products",
   description: "Get a paginated list of products with their offers",
   tags: ["Products"],
-  request: {
-    query: paginationSchema,
-  },
   responses: {
     200: {
       description: "Products retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            productsListResponseSchema,
+            "ProductsListSuccessResponse"
+          ),
         },
       },
     },
@@ -151,7 +143,10 @@ registry.registerPath({
       description: "Product retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            productDetailResponseSchema,
+            "ProductDetailSuccessResponse"
+          ),
         },
       },
     },
@@ -181,7 +176,10 @@ registry.registerPath({
       description: "Offers retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            productOffersResponseSchema,
+            "ProductOffersSuccessResponse"
+          ),
         },
       },
     },
@@ -211,7 +209,10 @@ registry.registerPath({
       description: "Product refreshed successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            productDetailResponseSchema,
+            "RefreshProductSuccessResponse"
+          ),
         },
       },
     },
@@ -255,7 +256,7 @@ registry.registerPath({
       description: "Campaign created successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(campaignDetailResponseSchema, "CreateCampaignSuccessResponse"),
         },
       },
     },
@@ -280,11 +281,11 @@ registry.registerPath({
 
 const campaignPaginationSchema = paginationSchema.extend({
   status: z
-    .enum(["active", "scheduled", "completed", "draft"])
+    .enum(["DRAFT", "ACTIVE", "PAUSED", "ENDED", "ARCHIVED"])
     .optional()
     .openapi({
       description: "Filter campaigns by status",
-      example: "active",
+      example: "ACTIVE",
     }),
 });
 
@@ -302,7 +303,10 @@ registry.registerPath({
       description: "Campaigns retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            campaignsListResponseSchema,
+            "CampaignsListSuccessResponse"
+          ),
         },
       },
     },
@@ -323,7 +327,10 @@ registry.registerPath({
       description: "Campaign retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            campaignDetailResponseSchema,
+            "GetCampaignSuccessResponse"
+          ),
         },
       },
     },
@@ -352,7 +359,10 @@ registry.registerPath({
       description: "Campaign retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            campaignDetailResponseSchema,
+            "GetCampaignBySlugSuccessResponse"
+          ),
         },
       },
     },
@@ -389,7 +399,10 @@ registry.registerPath({
       description: "Campaign updated successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            campaignDetailResponseSchema,
+            "UpdateCampaignSuccessResponse"
+          ),
         },
       },
     },
@@ -435,7 +448,10 @@ registry.registerPath({
       description: "Campaign archived successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            campaignDetailResponseSchema,
+            "DeleteCampaignSuccessResponse"
+          ),
         },
       },
     },
@@ -480,7 +496,10 @@ registry.registerPath({
       description: "Link created successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            linkDetailResponseSchema,
+            "CreateLinkSuccessResponse"
+          ),
         },
       },
     },
@@ -514,7 +533,10 @@ registry.registerPath({
       description: "Links retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            linksListResponseSchema,
+            "LinksListSuccessResponse"
+          ),
         },
       },
     },
@@ -536,7 +558,10 @@ registry.registerPath({
       description: "Dashboard data retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            dashboardResponseSchema,
+            "DashboardSuccessResponse"
+          ),
         },
       },
     },
@@ -558,7 +583,10 @@ registry.registerPath({
       description: "Analytics retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            analyticsOverviewSchema,
+            "AnalyticsOverviewSuccessResponse"
+          ),
         },
       },
     },
@@ -579,7 +607,10 @@ registry.registerPath({
       description: "Top products retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            topProductsResponseSchema,
+            "TopProductsSuccessResponse"
+          ),
         },
       },
     },
@@ -600,7 +631,10 @@ registry.registerPath({
       description: "Campaign analytics retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            campaignAnalyticsSchema,
+            "CampaignAnalyticsSuccessResponse"
+          ),
         },
       },
     },
@@ -651,7 +685,10 @@ registry.registerPath({
       description: "Job status retrieved successfully",
       content: {
         "application/json": {
-          schema: successResponseSchema,
+          schema: createSuccessResponseSchema(
+            jobStatusResponseSchema,
+            "JobStatusSuccessResponse"
+          ),
         },
       },
     },

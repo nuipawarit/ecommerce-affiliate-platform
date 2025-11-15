@@ -1,5 +1,5 @@
 import { prisma } from "@repo/database";
-import { CampaignStatus } from "@prisma/client";
+import { CampaignStatus } from "@repo/shared";
 import { generateUniqueSlug } from "../utils/slug-generator";
 import { NotFoundError } from "../middleware/error-handler";
 import type {
@@ -43,7 +43,7 @@ export class CampaignService {
           },
         },
         _count: {
-          select: { links: true },
+          select: { links: true, campaignProducts: true },
         },
       },
     });
@@ -81,7 +81,7 @@ export class CampaignService {
             },
           },
           _count: {
-            select: { links: true },
+            select: { links: true, campaignProducts: true },
           },
         },
         orderBy: { createdAt: "desc" },
@@ -116,7 +116,7 @@ export class CampaignService {
           },
         },
         _count: {
-          select: { links: true },
+          select: { links: true, campaignProducts: true },
         },
       },
     });
@@ -144,7 +144,7 @@ export class CampaignService {
           },
         },
         _count: {
-          select: { links: true },
+          select: { links: true, campaignProducts: true },
         },
       },
     });
@@ -215,7 +215,7 @@ export class CampaignService {
           },
         },
         _count: {
-          select: { links: true },
+          select: { links: true, campaignProducts: true },
         },
       },
     });

@@ -2,6 +2,7 @@ import type { Campaign, CampaignProduct } from './base';
 import { CampaignStatus } from './base';
 
 export { CampaignStatus };
+export type { Campaign, CampaignProduct };
 
 export interface CampaignWithRelations extends Campaign {
   campaignProducts?: Array<{

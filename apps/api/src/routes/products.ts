@@ -3,17 +3,18 @@ import { ProductService } from '../services/product.service';
 import { asyncHandler } from '../middleware/async-handler';
 import { validateBody, validateParams, validateQuery } from '../middleware/validation';
 import { requireAuth } from '../middleware/auth';
-import { createProductSchema, searchProductSchema, productIdSchema } from '../validations/product.validation';
+import {
+  createProductSchema,
+  searchProductSchema,
+  productIdSchema,
+  addOfferSchema,
+  checkSimilarSchema,
+} from '../validations/product.validation';
+import { paginationSchema } from '../validations/common.validation';
 import { successResponse } from '../utils/response';
-import { z } from 'zod';
 
 const router = Router();
 const productService = new ProductService();
-
-const paginationSchema = z.object({
-  page: z.string().optional().transform(val => val ? parseInt(val, 10) : undefined),
-  limit: z.string().optional().transform(val => val ? parseInt(val, 10) : undefined)
-});
 
 router.post(
   '/search',
@@ -83,11 +84,6 @@ router.put(
   })
 );
 
-const addOfferSchema = z.object({
-  url: z.string().url(),
-  marketplace: z.enum(['lazada', 'shopee'])
-});
-
 router.post(
   '/:id/offers',
   requireAuth,
@@ -101,11 +97,6 @@ router.post(
     res.json(successResponse(product));
   })
 );
-
-const checkSimilarSchema = z.object({
-  title: z.string().min(1),
-  threshold: z.number().min(0).max(1).optional()
-});
 
 router.post(
   '/check-similar',
