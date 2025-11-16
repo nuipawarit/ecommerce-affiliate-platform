@@ -1,74 +1,121 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, BarChart3, Link as LinkIcon, Package } from "lucide-react";
+import type { Metadata } from "next";
+import { Navbar } from "@/components/public/Navbar";
+import { HeroSection } from "@/components/public/HeroSection";
+import { TrustBadges } from "@/components/public/TrustBadges";
+import { StatsSection } from "@/components/public/StatsSection";
+import { FeaturedCampaignSection } from "@/components/public/FeaturedCampaignSection";
+import { CampaignSection } from "@/components/public/CampaignSection";
+import { EmptyState } from "@/components/public/EmptyState";
+import { Footer } from "@/components/public/Footer";
+import { apiGet } from "@/lib/api-client";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "DealFinder - Compare Lazada & Shopee Prices | Best Deals & Savings",
+  description:
+    "Find the best prices across Lazada and Shopee. Compare deals in real-time, track prices, and save money on your favorite products with our price comparison platform.",
+  keywords: [
+    "price comparison",
+    "Lazada",
+    "Shopee",
+    "best deals",
+    "online shopping",
+    "save money",
+    "affiliate",
+  ],
+  authors: [{ name: "DealFinder" }],
+  openGraph: {
+    title: "DealFinder - Compare Prices & Save Money",
+    description:
+      "Compare prices across Lazada and Shopee to find the best deals. Save money on every purchase.",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DealFinder - Best Deals on Lazada & Shopee",
+    description: "Compare prices and save money with real-time price tracking",
+  },
+};
+
+interface Campaign {
+  id: string;
+  name: string;
+  description?: string | null;
+  startAt?: string | null;
+  endAt?: string | null;
+  campaignProducts: Array<{
+    product: {
+      id: string;
+      title: string;
+      imageUrl: string;
+      offers: Array<{
+        id: string;
+        marketplace: "LAZADA" | "SHOPEE";
+        storeName: string;
+        price: number;
+      }>;
+    };
+  }>;
+  links: Array<{
+    id: string;
+    shortCode: string;
+    offerId: string;
+  }>;
+}
+
+async function getActiveCampaigns() {
+  try {
+    const response = await apiGet<{ campaigns: Campaign[] }>(
+      "/api/campaigns?status=ACTIVE&limit=12"
+    );
+    return response.campaigns || [];
+  } catch (error) {
+    console.error("Failed to fetch campaigns:", error);
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const campaigns = await getActiveCampaigns();
+  const hasCampaigns = campaigns.length > 0;
+  const featuredCampaign = campaigns[0];
+  const otherCampaigns = campaigns.slice(1);
+
+  const totalProducts = campaigns.reduce(
+    (sum, c) => sum + c.campaignProducts.length,
+    0
+  );
+  const totalClicks = 10000;
+
   return (
-    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
-      <div className="container mx-auto px-4 py-16">
-        <div className="flex flex-col items-center justify-center space-y-8 text-center">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-              Affiliate Platform
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl">
-              Compare prices from Lazada and Shopee, create marketing campaigns,
-              and track affiliate link performance
-            </p>
-          </div>
+    <>
+      <Navbar />
 
-          <div className="flex gap-4">
-            <Link href="/admin/dashboard">
-              <Button size="lg">
-                Go to Admin Panel
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
+      <main className="pt-16 md:pt-20">
+        <HeroSection />
 
-          <div className="grid gap-6 md:grid-cols-3 mt-16 w-full max-w-4xl">
-            <Card>
-              <CardHeader>
-                <Package className="h-8 w-8 mb-2 text-primary" />
-                <CardTitle>Product Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Add products from Lazada and Shopee URLs. Compare prices
-                  across marketplaces automatically.
-                </p>
-              </CardContent>
-            </Card>
+        <TrustBadges />
 
-            <Card>
-              <CardHeader>
-                <LinkIcon className="h-8 w-8 mb-2 text-primary" />
-                <CardTitle>Affiliate Links</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Generate short affiliate links with UTM tracking. Monitor
-                  clicks in real-time.
-                </p>
-              </CardContent>
-            </Card>
+        <StatsSection
+          totalProducts={totalProducts}
+          activeCampaigns={campaigns.length}
+          totalClicks={totalClicks}
+        />
 
-            <Card>
-              <CardHeader>
-                <BarChart3 className="h-8 w-8 mb-2 text-primary" />
-                <CardTitle>Analytics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Track campaign performance with detailed analytics and
-                  insights.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
+        {!hasCampaigns ? (
+          <EmptyState />
+        ) : (
+          <>
+            <FeaturedCampaignSection campaign={featuredCampaign} />
+
+            {otherCampaigns.map((campaign) => (
+              <CampaignSection key={campaign.id} campaign={campaign} />
+            ))}
+          </>
+        )}
+      </main>
+
+      <Footer />
+    </>
   );
 }

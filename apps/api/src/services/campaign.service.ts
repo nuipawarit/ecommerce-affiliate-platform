@@ -101,6 +101,25 @@ export class CampaignService {
               },
             },
           },
+          links: {
+            include: {
+              product: {
+                select: { id: true, title: true, imageUrl: true },
+              },
+              offer: {
+                select: {
+                  id: true,
+                  marketplace: true,
+                  storeName: true,
+                  price: true,
+                },
+              },
+              _count: {
+                select: { clicks: true },
+              },
+            },
+            orderBy: { createdAt: "desc" },
+          },
           _count: {
             select: { links: true, campaignProducts: true },
           },
