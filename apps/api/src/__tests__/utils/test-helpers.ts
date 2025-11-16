@@ -5,8 +5,8 @@ export async function cleanupDatabase() {
   await prisma.click.deleteMany();
   await prisma.link.deleteMany();
   await prisma.campaignProduct.deleteMany();
-  await prisma.campaign.deleteMany();
   await prisma.offer.deleteMany();
+  await prisma.campaign.deleteMany();
   await prisma.product.deleteMany();
 }
 
