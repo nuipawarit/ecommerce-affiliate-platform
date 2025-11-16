@@ -92,6 +92,14 @@ export class LinkService {
             slug: true,
           },
         },
+        offer: {
+          select: {
+            id: true,
+            marketplace: true,
+            storeName: true,
+            price: true,
+          },
+        },
         _count: {
           select: { clicks: true },
         },
