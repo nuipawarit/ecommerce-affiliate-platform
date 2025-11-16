@@ -46,6 +46,9 @@ COPY --from=builder /app/packages/shared/package.json ./packages/shared/package.
 # Install production dependencies only
 RUN bun install --production
 
+# Install OpenSSL for Prisma runtime
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 # Copy built artifacts
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/src ./apps/api/src
