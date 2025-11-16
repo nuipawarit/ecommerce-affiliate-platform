@@ -9,6 +9,7 @@ import Link from "next/link";
 import { LinkCard } from "../../components/LinkCard";
 import { LinkGenerationDialog } from "../../../links/components/LinkGenerationDialog";
 import type { CampaignWithRelations, LinkWithRelations } from "@repo/shared";
+import { CampaignStatus } from "@repo/shared";
 
 interface CampaignLinksTabProps {
   campaign: CampaignWithRelations;
@@ -25,7 +26,7 @@ export function CampaignLinksTab({ campaign }: CampaignLinksTabProps) {
     router.refresh();
   };
 
-  const canGenerateLinks = products.length > 0 && campaign.status !== 'ENDED';
+  const canGenerateLinks = products.length > 0 && campaign.status !== CampaignStatus.ENDED;
 
   return (
     <>
