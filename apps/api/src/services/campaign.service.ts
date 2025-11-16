@@ -8,6 +8,30 @@ import type {
 } from "../validations/campaign.validation";
 
 export class CampaignService {
+  private async addClickCounts<T extends { id: string; _count?: any }>(
+    campaigns: T[]
+  ): Promise<T[]> {
+    return Promise.all(
+      campaigns.map(async (campaign) => {
+        const clickCount = await prisma.click.count({
+          where: {
+            link: {
+              campaignId: campaign.id,
+            },
+          },
+        });
+
+        return {
+          ...campaign,
+          _count: {
+            ...campaign._count,
+            clicks: clickCount,
+          },
+        };
+      })
+    );
+  }
+
   async createCampaign(input: CreateCampaignInput) {
     const slug = await generateUniqueSlug(input.name);
 
@@ -48,7 +72,8 @@ export class CampaignService {
       },
     });
 
-    return campaign;
+    const [campaignWithClicks] = await this.addClickCounts([campaign]);
+    return campaignWithClicks;
   }
 
   async getAllCampaigns(filters?: {
@@ -89,8 +114,10 @@ export class CampaignService {
       prisma.campaign.count({ where }),
     ]);
 
+    const campaignsWithClicks = await this.addClickCounts(campaigns);
+
     return {
-      campaigns,
+      campaigns: campaignsWithClicks,
       pagination: {
         page,
         limit,
@@ -125,7 +152,8 @@ export class CampaignService {
       throw new NotFoundError(`Campaign with id ${id} not found`);
     }
 
-    return campaign;
+    const [campaignWithClicks] = await this.addClickCounts([campaign]);
+    return campaignWithClicks;
   }
 
   async getCampaignBySlug(slug: string) {
@@ -153,7 +181,8 @@ export class CampaignService {
       throw new NotFoundError(`Campaign with slug "${slug}" not found`);
     }
 
-    return campaign;
+    const [campaignWithClicks] = await this.addClickCounts([campaign]);
+    return campaignWithClicks;
   }
 
   async updateCampaign(id: string, input: UpdateCampaignInput) {
@@ -220,7 +249,8 @@ export class CampaignService {
       },
     });
 
-    return campaign;
+    const [campaignWithClicks] = await this.addClickCounts([campaign]);
+    return campaignWithClicks;
   }
 
   async deleteCampaign(id: string) {

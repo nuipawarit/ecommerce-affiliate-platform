@@ -24,7 +24,8 @@ import {
 } from "@/components/ui/dialog";
 import { StatusBadge } from "./StatusBadge";
 import { apiDelete } from "@/lib/api-client";
-import { Eye, Pencil, Trash2, Search, Megaphone, Calendar, Clock } from "lucide-react";
+import { Pencil, Trash2, Search, Megaphone, TrendingUp, TrendingDown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import type { CampaignWithRelations } from "@repo/shared";
 
 interface CampaignsTableProps {
@@ -39,6 +40,30 @@ export function CampaignsTable({ campaigns }: CampaignsTableProps) {
     null
   );
   const [deleting, setDeleting] = useState(false);
+
+  const maxClicks = Math.max(...campaigns.map((c) => c._count?.clicks ?? 0), 0);
+  const avgClicks =
+    campaigns.length > 0
+      ? campaigns.reduce((sum, c) => sum + (c._count?.clicks ?? 0), 0) /
+        campaigns.length
+      : 0;
+
+  const getPerformanceLevel = (clicks: number) => {
+    if (maxClicks === 0) return "none";
+    const percentage = (clicks / maxClicks) * 100;
+    if (percentage >= 80) return "high";
+    if (percentage >= 40) return "medium";
+    if (clicks > 0) return "low";
+    return "none";
+  };
+
+  const getClickColor = (clicks: number) => {
+    const level = getPerformanceLevel(clicks);
+    if (level === "high") return "text-green-600 dark:text-green-400";
+    if (level === "medium") return "text-blue-600 dark:text-blue-400";
+    if (level === "low") return "text-muted-foreground";
+    return "text-muted-foreground";
+  };
 
   const filteredCampaigns = campaigns.filter((campaign) =>
     campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -66,15 +91,6 @@ export function CampaignsTable({ campaigns }: CampaignsTableProps) {
     e.stopPropagation();
     setCampaignToDelete(campaign);
     setDeleteDialogOpen(true);
-  };
-
-  const formatDate = (date: string | null) => {
-    if (!date) return "—";
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   };
 
   const getCampaignDuration = (campaign: CampaignWithRelations) => {
@@ -136,16 +152,19 @@ export function CampaignsTable({ campaigns }: CampaignsTableProps) {
                   <TableRow>
                     <TableHead>Campaign Name</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-center">Products</TableHead>
-                    <TableHead className="text-center">Links</TableHead>
-                    <TableHead>Start Date</TableHead>
-                    <TableHead>End Date</TableHead>
+                    <TableHead className="text-right">Clicks</TableHead>
+                    <TableHead className="text-center">Products/Links</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead className="text-center">Performance</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredCampaigns.map((campaign) => {
                     const duration = getCampaignDuration(campaign);
+                    const clicks = campaign._count?.clicks ?? 0;
+                    const performanceLevel = getPerformanceLevel(clicks);
+                    const isTopPerformer = clicks === maxClicks && clicks > 0;
 
                     return (
                       <TableRow
@@ -162,62 +181,75 @@ export function CampaignsTable({ campaigns }: CampaignsTableProps) {
                         <TableCell>
                           <StatusBadge status={campaign.status} />
                         </TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <span className="font-medium">
-                              {campaign._count?.campaignProducts ?? 0}
+                        <TableCell className="text-right">
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={`font-bold text-lg ${getClickColor(clicks)}`}>
+                              {clicks.toLocaleString()}
                             </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <span className="font-medium">
-                              {campaign._count?.links ?? 0}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1.5 text-sm">
-                            <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                            {formatDate(campaign.startAt)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-1.5 text-sm">
-                              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                              {formatDate(campaign.endAt)}
-                            </div>
-                            {duration && (
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Clock className="w-3 h-3" />
-                                <span className={
-                                  duration === "Ended" ? "text-gray-500" :
-                                  duration.includes("day") && parseInt(duration) <= 3 ? "text-orange-600 font-medium" :
-                                  "text-muted-foreground"
-                                }>
-                                  {duration}
+                            {clicks > avgClicks && clicks > 0 && (
+                              <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                                <TrendingUp className="w-3 h-3" />
+                                <span className="text-[10px] font-medium">
+                                  Above avg
                                 </span>
                               </div>
                             )}
+                            {clicks < avgClicks && clicks > 0 && (
+                              <div className="flex items-center gap-1 text-muted-foreground">
+                                <TrendingDown className="w-3 h-3" />
+                                <span className="text-[10px]">Below avg</span>
+                              </div>
+                            )}
                           </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="text-sm text-muted-foreground">
+                            {campaign._count?.campaignProducts ?? 0} products / {campaign._count?.links ?? 0} links
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {duration ? (
+                            <span className={
+                              duration === "Ended" ? "text-gray-500 text-sm" :
+                              duration.includes("day") && parseInt(duration) <= 3 ? "text-orange-600 font-medium text-sm" :
+                              "text-sm"
+                            }>
+                              {duration}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">No end date</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {isTopPerformer && (
+                            <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+                              🔥 Top
+                            </Badge>
+                          )}
+                          {!isTopPerformer && performanceLevel === "high" && (
+                            <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                              ⚡ High
+                            </Badge>
+                          )}
+                          {performanceLevel === "medium" && (
+                            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400">
+                              📊 Medium
+                            </Badge>
+                          )}
+                          {performanceLevel === "low" && (
+                            <Badge variant="secondary" className="text-xs">
+                              Low
+                            </Badge>
+                          )}
+                          {performanceLevel === "none" && (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
                         </TableCell>
                         <TableCell
                           className="text-right"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <div className="flex items-center justify-end gap-2">
-                            <Link href={`/admin/campaigns/${campaign.id}`}>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                aria-label="View campaign"
-                                onClick={(e) => e.stopPropagation()}
-                                className="hover:bg-accent transition-colors"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                            </Link>
                             <Link href={`/admin/campaigns/${campaign.id}`}>
                               <Button
                                 variant="ghost"

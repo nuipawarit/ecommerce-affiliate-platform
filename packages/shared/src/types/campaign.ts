@@ -30,6 +30,7 @@ export interface CampaignWithRelations extends Campaign {
   _count?: {
     links: number;
     campaignProducts: number;
+    clicks: number;
   };
 }
 
