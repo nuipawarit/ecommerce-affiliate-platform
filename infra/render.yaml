@@ -1,0 +1,71 @@
+# Render Blueprint for Affiliate Platform
+# This file defines the infrastructure as code for deploying on Render.com
+# Documentation: https://render.com/docs/blueprint-spec
+
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: affiliate-db
+    plan: free
+    databaseName: affiliate_db
+    databaseUser: affiliate_user
+    region: oregon
+
+  # Redis Cache
+  - type: redis
+    name: affiliate-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    region: oregon
+
+  # API Service (Express.js + Bun)
+  - type: web
+    name: affiliate-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        fromDatabase:
+          name: affiliate-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: affiliate-redis
+          type: redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: demo
+      - key: ADMIN_PASSWORD
+        value: demo123
+      - key: API_BASE_URL
+        value: https://affiliate-api.onrender.com
+      - key: CORS_ORIGIN
+        value: https://affiliate-web.onrender.com
+
+  # Web Service (Next.js + Bun)
+  - type: web
+    name: affiliate-web
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./apps/web/Dockerfile
+    dockerContext: .
+    autoDeploy: false
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://affiliate-api.onrender.com
+
+# Database migrations
+# Run manually after deployment:
+# DATABASE_URL=<connection_string> bun --filter database prisma migrate deploy
