@@ -28,6 +28,9 @@ COPY apps/web ./apps/web
 COPY packages ./packages
 COPY package.json bun.lock turbo.json ./
 
+# Set placeholder DATABASE_URL for Prisma generation (real URL injected at runtime)
+ENV DATABASE_URL="postgresql://placeholder:placeholder@placeholder:5432/placeholder"
+
 # Generate Prisma client
 RUN cd packages/database && bun run db:generate
 
