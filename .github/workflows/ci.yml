@@ -58,7 +58,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: bun --filter database run db:generate
+        run: turbo run db:generate --filter=@repo/database
 
       - name: Run linter
         run: bun run lint
@@ -67,7 +67,7 @@ jobs:
         run: bun run type-check
 
       - name: Run database migrations
-        run: bun --filter database prisma migrate deploy
+        run: cd packages/database && bunx prisma migrate deploy
 
       - name: Run tests with coverage
         run: bun run test:coverage
