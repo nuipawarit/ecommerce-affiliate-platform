@@ -16,7 +16,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
+          POSTGRES_DB: affiliate_test_db
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -36,8 +36,8 @@ jobs:
           - 6379:6379
 
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-      REDIS_URL: redis://localhost:6379
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/affiliate_test_db
+      REDIS_URL: redis://localhost:6379/1
       JWT_SECRET: test-secret-key-for-ci
       API_BASE_URL: http://localhost:3001
       ADMIN_USERNAME: demo
