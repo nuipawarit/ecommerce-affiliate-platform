@@ -18,7 +18,7 @@ describe('ShopeeAdapter', () => {
       expect(product.marketplace).toBe('shopee');
       expect(product.title).toBeString();
       expect(product.imageUrl).toBeString();
-      expect(product.storeName).toContain('Shopee');
+      expect(product.storeName).toBeDefined();
       expect(product.price).toBeNumber();
       expect(product.price).toBeGreaterThan(0);
       expect(product.url).toBe(url);

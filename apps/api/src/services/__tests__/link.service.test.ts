@@ -28,23 +28,15 @@ describe("LinkService", () => {
       expect(result).toContain("utm_campaign=summer_sale");
     });
 
-    it("should append all UTM parameters when provided", () => {
+    it("should append utm_campaign parameter", () => {
       const offerUrl = "https://www.lazada.co.th/products/test-i123456.html";
       const campaign = {
         utmCampaign: "summer_sale",
-        utmSource: "website",
-        utmMedium: "banner",
-        utmContent: "hero",
-        utmTerm: "matcha",
       } as any;
 
       const result = service.buildTargetUrl(offerUrl, campaign);
 
       expect(result).toContain("utm_campaign=summer_sale");
-      expect(result).toContain("utm_source=website");
-      expect(result).toContain("utm_medium=banner");
-      expect(result).toContain("utm_content=hero");
-      expect(result).toContain("utm_term=matcha");
     });
 
     it("should handle URLs with existing query parameters", () => {
@@ -64,20 +56,16 @@ describe("LinkService", () => {
       expect(result).toContain("utm_campaign=summer_sale");
     });
 
-    it("should only include provided optional UTM parameters", () => {
+    it("should only include utm_campaign parameter", () => {
       const offerUrl = "https://www.lazada.co.th/products/test-i123456.html";
       const campaign = {
         utmCampaign: "summer_sale",
-        utmSource: "website",
-        utmMedium: null,
-        utmContent: null,
-        utmTerm: null,
       } as any;
 
       const result = service.buildTargetUrl(offerUrl, campaign);
 
       expect(result).toContain("utm_campaign=summer_sale");
-      expect(result).toContain("utm_source=website");
+      expect(result).not.toContain("utm_source");
       expect(result).not.toContain("utm_medium");
       expect(result).not.toContain("utm_content");
       expect(result).not.toContain("utm_term");

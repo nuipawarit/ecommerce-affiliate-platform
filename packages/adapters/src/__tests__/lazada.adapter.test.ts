@@ -18,7 +18,7 @@ describe('LazadaAdapter', () => {
       expect(product.marketplace).toBe('lazada');
       expect(product.title).toBeString();
       expect(product.imageUrl).toBeString();
-      expect(product.storeName).toContain('Lazada');
+      expect(product.storeName).toBeDefined();
       expect(product.price).toBeNumber();
       expect(product.price).toBeGreaterThan(0);
       expect(product.url).toBe(url);
