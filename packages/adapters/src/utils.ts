@@ -138,7 +138,7 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: "Cetaphil Gentle Skin Cleanser 500ml",
-    imageUrl: "https://images.unsplash.com/photo-1556228852-80a5e2f40c9d?w=800",
+    imageUrl: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800",
     storeName: "Watson Thailand",
     basePrice: 450,
     category: "beauty",

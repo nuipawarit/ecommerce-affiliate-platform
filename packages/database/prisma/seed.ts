@@ -1,5 +1,11 @@
-import { PrismaClient, Marketplace, CampaignStatus, type Product, type Offer } from '@prisma/client';
-import { nanoid } from 'nanoid';
+import {
+  PrismaClient,
+  Marketplace,
+  CampaignStatus,
+  type Product,
+  type Offer,
+} from "@prisma/client";
+import { nanoid } from "nanoid";
 
 const prisma = new PrismaClient();
 
@@ -36,7 +42,8 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: "Organic Honey 500ml - Pure Raw Wildflower",
-    imageUrl: "https://images.unsplash.com/photo-1616987381923-7b5118f26a6d?w=800",
+    imageUrl:
+      "https://images.unsplash.com/photo-1616987381923-7b5118f26a6d?w=800",
     storeName: "Nature Shop",
     basePrice: 350,
     category: "food",
@@ -45,7 +52,8 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: "iPhone 15 Pro Max 256GB - Titanium Blue",
-    imageUrl: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800",
+    imageUrl:
+      "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800",
     storeName: "iStudio Thailand",
     basePrice: 42990,
     category: "electronics",
@@ -54,7 +62,8 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: "Samsung Galaxy S24 Ultra 512GB - Titanium Gray",
-    imageUrl: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=800",
+    imageUrl:
+      "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=800",
     storeName: "Samsung Official Store",
     basePrice: 39990,
     category: "electronics",
@@ -63,7 +72,8 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: "AirPods Pro (2nd Generation) with MagSafe Charging",
-    imageUrl: "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=800",
+    imageUrl:
+      "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=800",
     storeName: "Apple Authorized Reseller",
     basePrice: 8990,
     category: "electronics",
@@ -81,7 +91,8 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: "Adidas Ultraboost 22 - Core Black US 10",
-    imageUrl: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800",
+    imageUrl:
+      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800",
     storeName: "Adidas Thailand",
     basePrice: 5500,
     category: "fashion",
@@ -90,7 +101,8 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: "SK-II Facial Treatment Essence 230ml",
-    imageUrl: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800",
+    imageUrl:
+      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800",
     storeName: "Beauty Siam",
     basePrice: 7200,
     category: "beauty",
@@ -99,7 +111,7 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: "Cetaphil Gentle Skin Cleanser 500ml",
-    imageUrl: "https://images.unsplash.com/photo-1556228852-80a5e2f40c9d?w=800",
+    imageUrl: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800",
     storeName: "Watson Thailand",
     basePrice: 450,
     category: "beauty",
@@ -117,7 +129,8 @@ const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     title: 'Lululemon Align High-Rise Pant 28" - Black Size 6',
-    imageUrl: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=800",
+    imageUrl:
+      "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=800",
     storeName: "Lululemon Thailand",
     basePrice: 3200,
     category: "fashion",
@@ -127,9 +140,9 @@ const MOCK_PRODUCTS: MockProduct[] = [
 ];
 
 async function main() {
-  console.log('🌱 Starting database seed...');
+  console.log("🌱 Starting database seed...");
 
-  console.log('📦 Creating products with offers...');
+  console.log("📦 Creating products with offers...");
 
   const products: ProductWithOffers[] = [];
 
@@ -137,10 +150,12 @@ async function main() {
     const priceVarianceLazada = 0.05 + Math.random() * 0.15;
     const priceVarianceShopee = 0.05 + Math.random() * 0.15;
     const lazadaPrice = Math.round(
-      mockProduct.basePrice * (1 + (Math.random() > 0.5 ? priceVarianceLazada : -priceVarianceLazada))
+      mockProduct.basePrice *
+        (1 + (Math.random() > 0.5 ? priceVarianceLazada : -priceVarianceLazada))
     );
     const shopeePrice = Math.round(
-      mockProduct.basePrice * (1 + (Math.random() > 0.5 ? priceVarianceShopee : -priceVarianceShopee))
+      mockProduct.basePrice *
+        (1 + (Math.random() > 0.5 ? priceVarianceShopee : -priceVarianceShopee))
     );
 
     const product = await prisma.product.create({
@@ -154,82 +169,86 @@ async function main() {
               marketplace: Marketplace.LAZADA,
               storeName: `${mockProduct.storeName} - Lazada`,
               price: lazadaPrice,
-              url: `https://www.lazada.co.th/products/${mockProduct.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-i${100000 + products.length}`,
+              url: `https://www.lazada.co.th/products/${mockProduct.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-i${100000 + products.length}`,
               sku: mockProduct.sku,
-              isActive: true
+              isActive: true,
             },
             {
               marketplace: Marketplace.SHOPEE,
               storeName: `${mockProduct.storeName} - Shopee`,
               price: shopeePrice,
-              url: `https://shopee.co.th/${mockProduct.title.replace(/[^a-zA-Z0-9]+/g, '-')}-i.${50000 + products.length}.${200000 + products.length}`,
+              url: `https://shopee.co.th/${mockProduct.title.replace(/[^a-zA-Z0-9]+/g, "-")}-i.${50000 + products.length}.${200000 + products.length}`,
               sku: mockProduct.sku,
-              isActive: true
-            }
-          ]
-        }
+              isActive: true,
+            },
+          ],
+        },
       },
-      include: { offers: true }
+      include: { offers: true },
     });
 
     products.push(product);
   }
 
-  console.log(`✅ Created ${products.length} products with ${products.length * 2} offers`);
+  console.log(
+    `✅ Created ${products.length} products with ${products.length * 2} offers`
+  );
 
-  console.log('📋 Creating campaigns...');
+  console.log("📋 Creating campaigns...");
 
   const campaign1 = await prisma.campaign.create({
     data: {
-      name: 'Health & Wellness Sale 2025',
-      slug: 'health-wellness-2025',
-      description: 'Get the best deals on food, beauty, and wellness products!',
+      name: "Health & Wellness Sale 2025",
+      slug: "health-wellness-2025",
+      description: "Get the best deals on food, beauty, and wellness products!",
       status: CampaignStatus.ACTIVE,
-      utmCampaign: 'health_wellness_2025',
-      startAt: new Date('2025-01-01'),
-      endAt: new Date('2025-12-31')
-    }
+      utmCampaign: "health_wellness_2025",
+      startAt: new Date("2025-01-01"),
+      endAt: new Date("2025-12-31"),
+    },
   });
 
   const campaign2 = await prisma.campaign.create({
     data: {
-      name: 'Tech & Electronics Deals',
-      slug: 'tech-electronics-deals',
-      description: 'Premium electronics and gadgets at unbeatable prices!',
+      name: "Tech & Electronics Deals",
+      slug: "tech-electronics-deals",
+      description: "Premium electronics and gadgets at unbeatable prices!",
       status: CampaignStatus.ACTIVE,
-      utmCampaign: 'tech_deals',
-      startAt: new Date('2025-01-01'),
-      endAt: new Date('2025-12-31')
-    }
+      utmCampaign: "tech_deals",
+      startAt: new Date("2025-01-01"),
+      endAt: new Date("2025-12-31"),
+    },
   });
 
   const campaign3 = await prisma.campaign.create({
     data: {
-      name: 'Fashion & Lifestyle Collection',
-      slug: 'fashion-lifestyle',
-      description: 'Discover the latest trends in fashion and activewear!',
+      name: "Fashion & Lifestyle Collection",
+      slug: "fashion-lifestyle",
+      description: "Discover the latest trends in fashion and activewear!",
       status: CampaignStatus.ACTIVE,
-      utmCampaign: 'fashion_collection',
-      startAt: new Date('2025-01-01'),
-      endAt: new Date('2025-12-31')
-    }
+      utmCampaign: "fashion_collection",
+      startAt: new Date("2025-01-01"),
+      endAt: new Date("2025-12-31"),
+    },
   });
 
   console.log(`✅ Created 3 campaigns`);
 
-  console.log('🔗 Linking products to campaigns...');
+  console.log("🔗 Linking products to campaigns...");
 
   const campaignProducts = [];
   let position = 1;
 
   for (const product of products) {
-    const mockProduct = MOCK_PRODUCTS.find(mp => mp.sku === product.offers[0]?.sku);
+    const mockProduct = MOCK_PRODUCTS.find(
+      (mp) => mp.sku === product.offers[0]?.sku
+    );
     if (!mockProduct) continue;
 
     let campaignId: string;
-    if (mockProduct.category === 'food' || mockProduct.category === 'beauty') {
+    if (mockProduct.category === "food" || mockProduct.category === "beauty") {
       campaignId = campaign1.id;
-    } else if (mockProduct.category === 'electronics') {
+    } else if (mockProduct.category === "electronics") {
       campaignId = campaign2.id;
     } else {
       campaignId = campaign3.id;
@@ -238,37 +257,38 @@ async function main() {
     campaignProducts.push({
       campaignId,
       productId: product.id,
-      position: position++
+      position: position++,
     });
   }
 
   await prisma.campaignProduct.createMany({
-    data: campaignProducts
+    data: campaignProducts,
   });
 
   console.log(`✅ Linked ${campaignProducts.length} products to campaigns`);
 
-  console.log('🔗 Creating affiliate links...');
+  console.log("🔗 Creating affiliate links...");
 
   const links = [];
 
   for (const product of products) {
-    const mockProduct = MOCK_PRODUCTS.find(mp => mp.sku === product.offers[0]?.sku);
+    const mockProduct = MOCK_PRODUCTS.find(
+      (mp) => mp.sku === product.offers[0]?.sku
+    );
     if (!mockProduct) continue;
 
     let campaign;
-    if (mockProduct.category === 'food' || mockProduct.category === 'beauty') {
+    if (mockProduct.category === "food" || mockProduct.category === "beauty") {
       campaign = campaign1;
-    } else if (mockProduct.category === 'electronics') {
+    } else if (mockProduct.category === "electronics") {
       campaign = campaign2;
     } else {
       campaign = campaign3;
     }
 
     for (const offer of product.offers) {
-
       const utmParams = new URLSearchParams({
-        utm_campaign: campaign.utmCampaign
+        utm_campaign: campaign.utmCampaign,
       });
 
       const targetUrl = `${offer.url}?${utmParams.toString()}`;
@@ -279,8 +299,8 @@ async function main() {
           campaignId: campaign.id,
           offerId: offer.id,
           shortCode: nanoid(8),
-          targetUrl
-        }
+          targetUrl,
+        },
       });
 
       links.push(link);
@@ -289,35 +309,39 @@ async function main() {
 
   console.log(`✅ Created ${links.length} affiliate links`);
 
-  console.log('📊 Creating sample click data...');
+  console.log("📊 Creating sample click data...");
 
   const clicksData = [];
   const now = new Date();
 
   for (const link of links.slice(0, 3)) {
     for (let i = 0; i < 5; i++) {
-      const timestamp = new Date(now.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000);
+      const timestamp = new Date(
+        now.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000
+      );
       clicksData.push({
         linkId: link.id,
         timestamp,
-        referrer: i % 2 === 0 ? 'https://facebook.com' : 'https://google.com',
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+        referrer: i % 2 === 0 ? "https://facebook.com" : "https://google.com",
+        userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
         ipAddress: `192.168.1.${Math.floor(Math.random() * 255)}`,
-        country: 'TH'
+        country: "TH",
       });
     }
   }
 
   await prisma.click.createMany({
-    data: clicksData
+    data: clicksData,
   });
 
   console.log(`✅ Created ${clicksData.length} sample clicks`);
 
-  console.log('\n🎉 Database seed completed successfully!\n');
-  console.log('📊 Summary:');
+  console.log("\n🎉 Database seed completed successfully!\n");
+  console.log("📊 Summary:");
   console.log(`   - ${products.length} Products`);
-  console.log(`   - ${products.length * 2} Offers (${products.length} from Lazada, ${products.length} from Shopee)`);
+  console.log(
+    `   - ${products.length * 2} Offers (${products.length} from Lazada, ${products.length} from Shopee)`
+  );
   console.log(`   - 3 Campaigns`);
   console.log(`   - ${links.length} Affiliate Links`);
   console.log(`   - ${clicksData.length} Sample Clicks`);
@@ -325,7 +349,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('❌ Error seeding database:', e);
+    console.error("❌ Error seeding database:", e);
     process.exit(1);
   })
   .finally(async () => {
