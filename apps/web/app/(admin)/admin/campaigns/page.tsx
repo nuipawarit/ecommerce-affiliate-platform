@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Plus, FileText, MousePointerClick, Trophy } from "lucide-react";
 import { apiGet } from "@/lib/api-client";
 import { CampaignsTable } from "./components/CampaignsTable";
-import type { CampaignWithRelations, CampaignsListResponse } from "@repo/shared";
+import type {
+  CampaignWithRelations,
+  CampaignsListResponse,
+} from "@repo/shared";
 
 async function getCampaigns(): Promise<CampaignWithRelations[]> {
   try {
@@ -33,17 +36,17 @@ export default async function CampaignsPage() {
     (sum, c) => sum + (c._count?.clicks ?? 0),
     0
   );
-  const avgClicksPerCampaign = totalCampaigns > 0
-    ? Math.round(totalClicks / totalCampaigns)
-    : 0;
+  const avgClicksPerCampaign =
+    totalCampaigns > 0 ? Math.round(totalClicks / totalCampaigns) : 0;
 
-  const topPerformingCampaign = campaigns.length > 0
-    ? campaigns.reduce((top, campaign) => {
-        const clicks = campaign._count?.clicks ?? 0;
-        const topClicks = top._count?.clicks ?? 0;
-        return clicks > topClicks ? campaign : top;
-      }, campaigns[0])
-    : null;
+  const topPerformingCampaign =
+    campaigns.length > 0
+      ? campaigns.reduce((top, campaign) => {
+          const clicks = campaign._count?.clicks ?? 0;
+          const topClicks = top?._count?.clicks ?? 0;
+          return clicks > topClicks ? campaign : top;
+        }, campaigns[0])
+      : null;
   const topPerformerClicks = topPerformingCampaign?._count?.clicks ?? 0;
 
   return (
@@ -90,7 +93,9 @@ export default async function CampaignsPage() {
                 </p>
                 <MousePointerClick className="w-4 h-4 text-muted-foreground" />
               </div>
-              <p className="text-3xl font-bold text-blue-600">{totalClicks.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-blue-600">
+                {totalClicks.toLocaleString()}
+              </p>
               <p className="text-xs text-muted-foreground mt-1">
                 {avgClicksPerCampaign.toLocaleString()} avg per campaign
               </p>
@@ -115,7 +120,9 @@ export default async function CampaignsPage() {
                   </p>
                 </>
               ) : (
-                <p className="text-xl font-medium text-muted-foreground">No clicks yet</p>
+                <p className="text-xl font-medium text-muted-foreground">
+                  No clicks yet
+                </p>
               )}
             </CardContent>
           </Card>
