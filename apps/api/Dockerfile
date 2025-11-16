@@ -43,16 +43,21 @@ COPY --from=builder /app/packages/database/package.json ./packages/database/pack
 COPY --from=builder /app/packages/adapters/package.json ./packages/adapters/package.json
 COPY --from=builder /app/packages/shared/package.json ./packages/shared/package.json
 
+# Copy source code from packages
+COPY --from=builder /app/packages ./packages
+
 # Install production dependencies only
 RUN bun install --production
 
 # Install OpenSSL for Prisma runtime
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
+# Generate Prisma Client for production runtime
+RUN cd packages/database && bun run db:generate
+
 # Copy built artifacts
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/src ./apps/api/src
-COPY --from=builder /app/packages ./packages
 
 # Expose port
 EXPOSE 3001
