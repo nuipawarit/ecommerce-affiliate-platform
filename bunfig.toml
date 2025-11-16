@@ -1,0 +1,7 @@
+[test]
+# Coverage thresholds for the project
+# Lines and functions: 70%, Branches: 65%
+coverageThreshold = { lines = 0.7, functions = 0.7 }
+
+# Note: Bun doesn't support branch coverage threshold yet
+# We use custom script (scripts/check-coverage.ts) for branch threshold checks

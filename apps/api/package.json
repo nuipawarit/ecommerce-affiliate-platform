@@ -9,7 +9,9 @@
     "start": "bun run dist/server.js",
     "lint": "eslint --max-warnings 0 src/",
     "type-check": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "test:coverage": "bun test --coverage --coverage-reporter=text --coverage-reporter=lcov",
+    "test:ci": "bun test --no-cache"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.1.0",
