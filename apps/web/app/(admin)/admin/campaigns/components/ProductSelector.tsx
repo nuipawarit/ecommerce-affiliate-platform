@@ -20,10 +20,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { apiGet } from "@/lib/api-client";
 
+interface Offer {
+  id: string;
+  marketplace: string;
+  price: number;
+}
+
 interface Product {
   id: string;
   title: string;
   imageUrl: string;
+  offers?: Offer[];
 }
 
 interface ProductSelectorProps {
@@ -96,30 +103,61 @@ export function ProductSelector({
                 {loading ? "Loading products..." : "No products found."}
               </CommandEmpty>
               <CommandGroup>
-                {products.map((product) => (
-                  <CommandItem
-                    key={product.id}
-                    value={product.title}
-                    onSelect={() => toggleProduct(product.id)}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedProductIds.includes(product.id)
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    <div className="flex items-center gap-2 flex-1">
+                {products.map((product) => {
+                  const offers = product.offers || [];
+                  const prices = offers.map(o => o.price);
+                  const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+                  const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
+                  const lazadaCount = offers.filter(o => o.marketplace === 'lazada').length;
+                  const shopeeCount = offers.filter(o => o.marketplace === 'shopee').length;
+
+                  return (
+                    <CommandItem
+                      key={product.id}
+                      value={product.title}
+                      onSelect={() => toggleProduct(product.id)}
+                      className="flex items-start gap-3 p-3"
+                    >
+                      <Check
+                        className={cn(
+                          "mt-1 h-4 w-4 shrink-0",
+                          selectedProductIds.includes(product.id)
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
                       <img
                         src={product.imageUrl}
                         alt={product.title}
-                        className="h-8 w-8 rounded object-cover"
+                        className="h-12 w-12 rounded object-cover shrink-0"
                       />
-                      <span className="truncate">{product.title}</span>
-                    </div>
-                  </CommandItem>
-                ))}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{product.title}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          {offers.length > 0 && (
+                            <>
+                              <span className="text-sm text-muted-foreground">
+                                ฿{minPrice.toLocaleString()}{maxPrice !== minPrice && ` - ฿${maxPrice.toLocaleString()}`}
+                              </span>
+                              <div className="flex gap-1">
+                                {lazadaCount > 0 && (
+                                  <Badge variant="outline" className="h-5 px-1.5 text-xs bg-orange-50 text-orange-700 border-orange-200">
+                                    L
+                                  </Badge>
+                                )}
+                                {shopeeCount > 0 && (
+                                  <Badge variant="outline" className="h-5 px-1.5 text-xs bg-red-50 text-red-700 border-red-200">
+                                    S
+                                  </Badge>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             </CommandList>
           </Command>

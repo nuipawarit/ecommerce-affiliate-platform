@@ -17,6 +17,10 @@ export const createCampaignSchema = z
       description: "Campaign description",
       example: "Best summer deals on matcha products",
     }),
+    status: z.enum([CampaignStatus.DRAFT, CampaignStatus.ACTIVE, CampaignStatus.PAUSED, CampaignStatus.ENDED] as const).optional().openapi({
+      description: "Campaign status (defaults to DRAFT if not provided)",
+      example: CampaignStatus.DRAFT,
+    }),
     productIds: z
       .array(z.cuid("Invalid product ID"))
       .min(1, "At least one product is required")

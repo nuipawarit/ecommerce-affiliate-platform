@@ -40,7 +40,7 @@ export class CampaignService {
         name: input.name,
         slug,
         description: input.description,
-        status: CampaignStatus.ACTIVE,
+        status: input.status || CampaignStatus.DRAFT,
         utmCampaign: input.utmCampaign,
         startAt: input.startAt ? new Date(input.startAt) : null,
         endAt: input.endAt ? new Date(input.endAt) : null,
