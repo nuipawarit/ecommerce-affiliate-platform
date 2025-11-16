@@ -42,10 +42,6 @@ export class CampaignService {
         description: input.description,
         status: CampaignStatus.ACTIVE,
         utmCampaign: input.utmCampaign,
-        utmSource: input.utmSource,
-        utmMedium: input.utmMedium,
-        utmContent: input.utmContent,
-        utmTerm: input.utmTerm,
         startAt: input.startAt ? new Date(input.startAt) : null,
         endAt: input.endAt ? new Date(input.endAt) : null,
         campaignProducts: {
@@ -205,11 +201,6 @@ export class CampaignService {
       updateData.description = input.description;
     if (input.utmCampaign !== undefined)
       updateData.utmCampaign = input.utmCampaign;
-    if (input.utmSource !== undefined) updateData.utmSource = input.utmSource;
-    if (input.utmMedium !== undefined) updateData.utmMedium = input.utmMedium;
-    if (input.utmContent !== undefined)
-      updateData.utmContent = input.utmContent;
-    if (input.utmTerm !== undefined) updateData.utmTerm = input.utmTerm;
     if (input.status !== undefined) updateData.status = input.status;
     if (input.startAt !== undefined)
       updateData.startAt = input.startAt ? new Date(input.startAt) : null;

@@ -65,10 +65,6 @@ model Campaign {
   description String?        @db.Text
   status      CampaignStatus @default(DRAFT)
   utmCampaign String
-  utmSource   String?
-  utmMedium   String?
-  utmContent  String?
-  utmTerm     String?
   startAt     DateTime?
   endAt       DateTime?
   createdAt   DateTime       @default(now())

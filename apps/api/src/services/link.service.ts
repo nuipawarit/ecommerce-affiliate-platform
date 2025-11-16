@@ -112,25 +112,7 @@ export class LinkService {
 
   buildTargetUrl(offerUrl: string, campaign: Campaign): string {
     const url = new URL(offerUrl);
-
     url.searchParams.set("utm_campaign", campaign.utmCampaign);
-
-    if (campaign.utmSource) {
-      url.searchParams.set("utm_source", campaign.utmSource);
-    }
-
-    if (campaign.utmMedium) {
-      url.searchParams.set("utm_medium", campaign.utmMedium);
-    }
-
-    if (campaign.utmContent) {
-      url.searchParams.set("utm_content", campaign.utmContent);
-    }
-
-    if (campaign.utmTerm) {
-      url.searchParams.set("utm_term", campaign.utmTerm);
-    }
-
     return url.toString();
   }
 

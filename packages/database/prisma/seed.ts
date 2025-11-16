@@ -186,8 +186,6 @@ async function main() {
       description: 'Get the best deals on food, beauty, and wellness products!',
       status: CampaignStatus.ACTIVE,
       utmCampaign: 'health_wellness_2025',
-      utmSource: 'affiliate',
-      utmMedium: 'landing_page',
       startAt: new Date('2025-01-01'),
       endAt: new Date('2025-12-31')
     }
@@ -200,8 +198,6 @@ async function main() {
       description: 'Premium electronics and gadgets at unbeatable prices!',
       status: CampaignStatus.ACTIVE,
       utmCampaign: 'tech_deals',
-      utmSource: 'affiliate',
-      utmMedium: 'social',
       startAt: new Date('2025-01-01'),
       endAt: new Date('2025-12-31')
     }
@@ -214,8 +210,6 @@ async function main() {
       description: 'Discover the latest trends in fashion and activewear!',
       status: CampaignStatus.ACTIVE,
       utmCampaign: 'fashion_collection',
-      utmSource: 'affiliate',
-      utmMedium: 'landing_page',
       startAt: new Date('2025-01-01'),
       endAt: new Date('2025-12-31')
     }
@@ -274,9 +268,7 @@ async function main() {
     for (const offer of product.offers) {
 
       const utmParams = new URLSearchParams({
-        utm_campaign: campaign.utmCampaign,
-        utm_source: campaign.utmSource || 'affiliate',
-        utm_medium: campaign.utmMedium || 'web'
+        utm_campaign: campaign.utmCampaign
       });
 
       const targetUrl = `${offer.url}?${utmParams.toString()}`;

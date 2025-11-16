@@ -40,10 +40,6 @@ export interface CreateCampaignDTO {
   description?: string | null;
   status?: CampaignStatus;
   utmCampaign: string;
-  utmSource?: string | null;
-  utmMedium?: string | null;
-  utmContent?: string | null;
-  utmTerm?: string | null;
   startAt?: string | null;
   endAt?: string | null;
   productIds?: string[];
@@ -55,10 +51,6 @@ export interface UpdateCampaignDTO {
   description?: string | null;
   status?: CampaignStatus;
   utmCampaign?: string;
-  utmSource?: string | null;
-  utmMedium?: string | null;
-  utmContent?: string | null;
-  utmTerm?: string | null;
   startAt?: string | null;
   endAt?: string | null;
   productIds?: string[];

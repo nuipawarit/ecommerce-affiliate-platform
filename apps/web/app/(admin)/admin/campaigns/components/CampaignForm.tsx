@@ -27,8 +27,6 @@ interface Campaign {
   status: CampaignStatus;
   startAt: string | null;
   endAt: string | null;
-  utmSource: string;
-  utmMedium: string;
   utmCampaign: string;
 }
 
@@ -47,8 +45,6 @@ export function CampaignForm({ initialData, mode }: CampaignFormProps) {
     status: initialData?.status || "DRAFT",
     startAt: initialData?.startAt || null,
     endAt: initialData?.endAt || null,
-    utmSource: initialData?.utmSource || "",
-    utmMedium: initialData?.utmMedium || "affiliate",
     utmCampaign: initialData?.utmCampaign || "",
   });
 
@@ -102,8 +98,6 @@ export function CampaignForm({ initialData, mode }: CampaignFormProps) {
         status: formData.status,
         startAt: formData.startAt,
         endAt: formData.endAt,
-        utmSource: formData.utmSource,
-        utmMedium: formData.utmMedium,
         utmCampaign: formData.utmCampaign,
       };
 
@@ -246,30 +240,6 @@ export function CampaignForm({ initialData, mode }: CampaignFormProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="utmSource">UTM Source *</Label>
-            <Input
-              id="utmSource"
-              name="utmSource"
-              value={formData.utmSource}
-              onChange={handleInputChange}
-              placeholder="facebook"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="utmMedium">UTM Medium *</Label>
-            <Input
-              id="utmMedium"
-              name="utmMedium"
-              value={formData.utmMedium}
-              onChange={handleInputChange}
-              placeholder="affiliate"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="utmCampaign">UTM Campaign *</Label>
             <Input
               id="utmCampaign"
@@ -279,14 +249,15 @@ export function CampaignForm({ initialData, mode }: CampaignFormProps) {
               placeholder="summer-sale"
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Used for tracking campaign performance in analytics
+            </p>
           </div>
 
           <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
-            <p className="font-medium mb-1">Generated UTM Parameters:</p>
+            <p className="font-medium mb-1">Generated UTM Parameter:</p>
             <code className="text-xs">
-              ?utm_source={formData.utmSource || "..."}&utm_medium=
-              {formData.utmMedium || "..."}&utm_campaign=
-              {formData.utmCampaign || "..."}
+              ?utm_campaign={formData.utmCampaign || "..."}
             </code>
           </div>
         </CardContent>

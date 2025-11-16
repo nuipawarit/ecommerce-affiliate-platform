@@ -58,8 +58,6 @@ export default async function CampaignDetailPage({
     status: campaign.status,
     startAt: campaign.startAt,
     endAt: campaign.endAt,
-    utmSource: campaign.utmSource || "",
-    utmMedium: campaign.utmMedium || "",
     utmCampaign: campaign.utmCampaign,
   };
 
