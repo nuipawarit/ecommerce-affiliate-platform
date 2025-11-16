@@ -126,13 +126,62 @@ export class AnalyticsService {
             }
           : null;
       })
-      .filter((c): c is { id: string; name: string; clicks: number } => c !== null)
+      .filter(
+        (c): c is { id: string; name: string; clicks: number } => c !== null
+      )
       .sort((a, b) => b.clicks - a.clicks)
       .slice(0, 5);
 
+    const [totalLinks, totalCampaigns, totalProducts, clicksLast30Days] =
+      await Promise.all([
+        prisma.link.count(),
+        prisma.campaign.count(),
+        prisma.product.count(),
+        prisma.click.findMany({
+          where: {
+            timestamp: {
+              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          },
+          select: {
+            timestamp: true,
+          },
+        }),
+      ]);
+
+    const dailyClicksMap = new Map<string, number>();
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      const dateStr = date.toISOString().split("T")[0];
+      if (dateStr) {
+        dailyClicksMap.set(dateStr, 0);
+      }
+    }
+
+    for (const click of clicksLast30Days) {
+      const dateStr = click.timestamp.toISOString().split("T")[0];
+      if (dateStr && dailyClicksMap.has(dateStr)) {
+        const current = dailyClicksMap.get(dateStr);
+        if (current !== undefined) {
+          dailyClicksMap.set(dateStr, current + 1);
+        }
+      }
+    }
+
+    const clicksByDay = Array.from(dailyClicksMap.entries()).map(
+      ([date, clicks]) => ({
+        date,
+        clicks,
+      })
+    );
+
     const result = {
       totalClicks,
+      totalLinks,
+      totalCampaigns,
+      totalProducts,
       clicksByMarketplace,
+      clicksByDay,
       topCampaigns: topCampaignsData,
     };
 
@@ -159,50 +208,47 @@ export class AnalyticsService {
       console.error("Redis get error:", error);
     }
 
-    const clicksByLink = await prisma.click.groupBy({
-      by: ["linkId"],
-      _count: true,
-      orderBy: {
-        _count: {
-          linkId: "desc",
-        },
-      },
-      take: limit,
-    });
-
-    const linkIds = clicksByLink
-      .map((c) => c.linkId)
-      .filter((id): id is string => id !== null);
-
-    const links = await prisma.link.findMany({
-      where: {
-        id: { in: linkIds },
-      },
+    const clicks = await prisma.click.findMany({
       include: {
-        product: {
-          select: {
-            id: true,
-            title: true,
-            imageUrl: true,
+        link: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                title: true,
+                imageUrl: true,
+              },
+            },
           },
         },
       },
     });
 
-    const linkMap = new Map(links.map((link) => [link.id, link]));
+    const productClickMap = new Map<
+      string,
+      { id: string; title: string; imageUrl: string; clicks: number }
+    >();
 
-    const result = clicksByLink
-      .map((click) => {
-        if (click.linkId === null) return null;
-        const link = linkMap.get(click.linkId);
-        if (!link) return null;
+    for (const click of clicks) {
+      if (click.link === null) continue;
+      const product = click.link.product;
+      const existing = productClickMap.get(product.id);
 
-        return {
-          product: link.product,
-          clicks: click._count,
-        };
-      })
-      .filter((item) => item !== null);
+      if (existing) {
+        existing.clicks += 1;
+      } else {
+        productClickMap.set(product.id, {
+          id: product.id,
+          title: product.title,
+          imageUrl: product.imageUrl,
+          clicks: 1,
+        });
+      }
+    }
+
+    const result = Array.from(productClickMap.values())
+      .sort((a, b) => b.clicks - a.clicks)
+      .slice(0, limit);
 
     try {
       const redis = getRedisClient();
@@ -314,7 +360,14 @@ export class AnalyticsService {
           clicks: click._count,
         };
       })
-      .filter((item): item is { product: { id: string; title: string; imageUrl: string }; clicks: number } => item !== null);
+      .filter(
+        (
+          item
+        ): item is {
+          product: { id: string; title: string; imageUrl: string };
+          clicks: number;
+        } => item !== null
+      );
 
     const dailyClicksMap = new Map<string, number>();
     for (let i = 6; i >= 0; i--) {

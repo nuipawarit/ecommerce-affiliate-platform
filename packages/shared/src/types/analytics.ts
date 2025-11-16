@@ -13,9 +13,13 @@ export interface AnalyticsOverview {
     name: string;
     clicks: number;
   }>;
+}
+
+export interface DashboardData extends AnalyticsOverview {
   topProducts: Array<{
     id: string;
     title: string;
+    imageUrl?: string;
     clicks: number;
   }>;
 }
