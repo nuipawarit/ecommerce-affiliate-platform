@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { buildAffiliateLink } from "@/lib/link-utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -81,7 +82,7 @@ export function LinksTable({ links }: LinksTableProps) {
     linkId: string
   ) => {
     e.stopPropagation();
-    const shortUrl = `${window.location.origin}/go/${shortCode}`;
+    const shortUrl = buildAffiliateLink(shortCode);
     try {
       await navigator.clipboard.writeText(shortUrl);
       setCopiedId(linkId);

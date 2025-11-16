@@ -14,6 +14,7 @@ import { OfferSelector } from "./OfferSelector";
 import { LinkPreviewCard } from "./LinkPreviewCard";
 import { ProgressIndicator } from "./ProgressIndicator";
 import { apiGet, apiPost } from "@/lib/api-client";
+import { buildAffiliateLink } from "@/lib/link-utils";
 import {
   Link as LinkIcon,
   Copy,
@@ -135,7 +136,7 @@ export function LinkGeneratorForm() {
   const handleCopy = async () => {
     if (!generatedLink) return;
 
-    const shortUrl = `${window.location.origin}/go/${generatedLink.shortCode}`;
+    const shortUrl = buildAffiliateLink(generatedLink.shortCode);
     try {
       await navigator.clipboard.writeText(shortUrl);
       setCopied(true);
@@ -194,7 +195,7 @@ export function LinkGeneratorForm() {
               <Label>Short URL</Label>
               <div className="flex gap-2">
                 <code className="flex-1 text-lg font-mono font-bold bg-background px-4 py-3 rounded border">
-                  {`${typeof window !== "undefined" ? window.location.origin : ""}/go/${generatedLink.shortCode}`}
+                  {buildAffiliateLink(generatedLink.shortCode)}
                 </code>
                 <Button onClick={handleCopy} size="lg" variant="outline">
                   {copied ? (

@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Link as LinkIcon } from "lucide-react";
+import { getLinkDomain, buildAffiliateLink } from "@/lib/link-utils";
 
 interface LinkPreviewCardProps {
   campaignName?: string;
@@ -21,8 +22,8 @@ export function LinkPreviewCard({
   shortCode,
   targetUrl,
 }: LinkPreviewCardProps) {
-  const domain = typeof window !== "undefined" ? window.location.origin : "";
-  const shortUrl = shortCode ? `${domain}/go/${shortCode}` : "";
+  const domain = getLinkDomain();
+  const shortUrl = shortCode ? buildAffiliateLink(shortCode) : "";
 
   const hasPreview = campaignName || productTitle || marketplace;
 

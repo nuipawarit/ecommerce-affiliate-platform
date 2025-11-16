@@ -1,17 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Calendar, Tag, ExternalLink, Plus } from "lucide-react";
+import { ChevronLeft, Calendar, Tag, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiGet } from "@/lib/api-client";
 import { CampaignForm } from "../components/CampaignForm";
 import { CampaignStats } from "../components/CampaignStats";
 import { StatusBadge } from "../components/StatusBadge";
-import { LinkCard } from "../components/LinkCard";
 import { CampaignProductsManager } from "../components/CampaignProductsManager";
+import { CampaignLinksTab } from "./components/CampaignLinksTab";
 import type { CampaignWithRelations, CampaignDetailResponse } from "@repo/shared";
 
 async function getCampaign(
@@ -144,29 +143,7 @@ export default async function CampaignDetailPage({
         </TabsContent>
 
         <TabsContent value="links" className="space-y-4">
-          {campaign.links && campaign.links.length > 0 ? (
-            <div className="grid gap-3">
-              {campaign.links.map((link) => (
-                <LinkCard key={link.id} link={link} />
-              ))}
-            </div>
-          ) : (
-            <Card className="border-dashed">
-              <CardContent className="py-16 text-center">
-                <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-                  <Plus className="w-6 h-6 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">No links generated</h3>
-                <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
-                  Generate affiliate links for products in this campaign
-                </p>
-                <Button variant="outline" disabled>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Generate Link
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+          <CampaignLinksTab campaign={campaign} />
         </TabsContent>
 
         <TabsContent value="settings">
