@@ -50,7 +50,7 @@ git push origin main
 
 1. In Render dashboard, click **"New" → "Blueprint"**
 2. Select your repository: `ecommerce-affiliate-platform`
-3. Render will detect `infra/render.yaml`
+3. Render will detect `render.yaml`
 4. Click **"Apply"**
 5. Wait for services to deploy (~5-10 minutes)
 
