@@ -2,17 +2,17 @@
 # This file defines the infrastructure as code for deploying on Render.com
 # Documentation: https://render.com/docs/blueprint-spec
 
-services:
+databases:
   # PostgreSQL Database
-  - type: pserv
-    name: affiliate-db
+  - name: affiliate-db
     plan: free
     databaseName: affiliate_db
-    databaseUser: affiliate_user
+    user: affiliate_user
     region: oregon
 
+services:
   # Redis Cache
-  - type: redis
+  - type: keyvalue
     name: affiliate-redis
     plan: free
     maxmemoryPolicy: allkeys-lru
@@ -27,7 +27,7 @@ services:
     dockerfilePath: ./apps/api/Dockerfile
     dockerContext: .
     healthCheckPath: /api/health
-    autoDeploy: false
+    autoDeployTrigger: off
     envVars:
       - key: NODE_ENV
         value: production
@@ -40,7 +40,7 @@ services:
       - key: REDIS_URL
         fromService:
           name: affiliate-redis
-          type: redis
+          type: keyvalue
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
@@ -61,7 +61,7 @@ services:
     region: oregon
     dockerfilePath: ./apps/web/Dockerfile
     dockerContext: .
-    autoDeploy: false
+    autoDeployTrigger: off
     envVars:
       - key: NEXT_PUBLIC_API_URL
         value: https://affiliate-api.onrender.com
