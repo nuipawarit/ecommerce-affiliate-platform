@@ -58,7 +58,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: turbo run db:generate --filter=@repo/database
+        run: cd packages/database && bun run db:generate
 
       - name: Run linter
         run: bun run lint
