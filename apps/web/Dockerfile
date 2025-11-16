@@ -20,6 +20,10 @@ FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
+# Accept build argument for Next.js public API URL
+ARG NEXT_PUBLIC_API_URL=http://localhost:3001
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 # Copy dependencies
 COPY --from=deps /app/node_modules ./node_modules
 

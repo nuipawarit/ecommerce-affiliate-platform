@@ -50,11 +50,16 @@ services:
       - key: ADMIN_PASSWORD
         value: demo123
       - key: API_BASE_URL
-        value: https://affiliate-api.onrender.com
+        value: https://affiliate-api-ti9a.onrender.com
       - key: CORS_ORIGIN
-        value: https://affiliate-web.onrender.com
+        value: https://affiliate-web-96ne.onrender.com
 
   # Web Service (Next.js + Bun)
+  # IMPORTANT: To fix NEXT_PUBLIC_API_URL undefined issue:
+  # 1. Go to Render Dashboard → affiliate-web service → Settings
+  # 2. Under "Docker" section, add Docker Build Command:
+  #    --build-arg NEXT_PUBLIC_API_URL=https://affiliate-api-ti9a.onrender.com
+  # 3. This ensures Next.js receives the API URL at BUILD TIME (required for NEXT_PUBLIC_ vars)
   - type: web
     name: affiliate-web
     runtime: docker
@@ -65,7 +70,7 @@ services:
     autoDeployTrigger: off
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: https://affiliate-api.onrender.com
+        value: https://affiliate-api-ti9a.onrender.com
 
 # Database migrations
 # Run manually after deployment:

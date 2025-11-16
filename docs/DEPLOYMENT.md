@@ -92,6 +92,18 @@ If Blueprint deployment fails, create services manually:
 
 After services are created, update environment variables in Render dashboard:
 
+**IMPORTANT: For Web Service Docker Build Args**
+
+Next.js requires `NEXT_PUBLIC_*` environment variables at **BUILD TIME**, not runtime.
+
+To configure:
+1. Go to Render Dashboard → `affiliate-web` service → **Settings**
+2. Scroll to **Docker** section
+3. Find **Docker Build Command** field
+4. Add: `--build-arg NEXT_PUBLIC_API_URL=https://affiliate-api-ti9a.onrender.com`
+5. Click **Save Changes**
+6. Trigger manual deploy to rebuild with build arg
+
 #### API Service Environment Variables
 
 | Variable | Value | Notes |
@@ -101,8 +113,8 @@ After services are created, update environment variables in Render dashboard:
 | `DATABASE_URL` | (auto-linked) | From affiliate-db |
 | `REDIS_URL` | (auto-linked) | From affiliate-redis |
 | `JWT_SECRET` | Generate new | See below |
-| `API_BASE_URL` | (copy from Render) | `https://affiliate-api.onrender.com` |
-| `CORS_ORIGIN` | (copy from Render) | `https://affiliate-web.onrender.com` |
+| `API_BASE_URL` | (copy from Render) | `https://affiliate-api-ti9a.onrender.com` |
+| `CORS_ORIGIN` | (copy from Render) | `https://affiliate-web-96ne.onrender.com` |
 | `ADMIN_USERNAME` | `demo` | Already set |
 | `ADMIN_PASSWORD` | `demo123` | Already set |
 
@@ -115,7 +127,7 @@ openssl rand -base64 32
 
 | Variable | Value | Notes |
 |----------|-------|-------|
-| `NEXT_PUBLIC_API_URL` | (copy from Render) | `https://affiliate-api.onrender.com` |
+| `NEXT_PUBLIC_API_URL` | (copy from Render) | `https://affiliate-api-ti9a.onrender.com` |
 
 **Important:** Update `API_BASE_URL` and `CORS_ORIGIN` in API service AFTER web service URL is available.
 
@@ -156,7 +168,7 @@ Check all services are healthy:
 
 ✅ **API Health Check:**
 ```bash
-curl https://affiliate-api.onrender.com/api/health
+curl https://affiliate-api-ti9a.onrender.com/api/health
 ```
 
 Expected response:
@@ -170,10 +182,10 @@ Expected response:
 ```
 
 ✅ **API Documentation:**
-Visit: `https://affiliate-api.onrender.com/api/docs`
+Visit: `https://affiliate-api-ti9a.onrender.com/api/docs`
 
 ✅ **Web App:**
-Visit: `https://affiliate-web.onrender.com`
+Visit: `https://affiliate-web-96ne.onrender.com`
 
 ✅ **Login Test:**
 - Go to web app `/login`
@@ -253,8 +265,8 @@ REDIS_URL=redis://host:port
 JWT_SECRET=<generate-with-openssl>
 
 # URLs (update after deployment)
-API_BASE_URL=https://affiliate-api.onrender.com
-CORS_ORIGIN=https://affiliate-web.onrender.com
+API_BASE_URL=https://affiliate-api-ti9a.onrender.com
+CORS_ORIGIN=https://affiliate-web-96ne.onrender.com
 
 # Demo credentials
 ADMIN_USERNAME=demo
@@ -265,7 +277,7 @@ ADMIN_PASSWORD=demo123
 
 ```env
 # API connection
-NEXT_PUBLIC_API_URL=https://affiliate-api.onrender.com
+NEXT_PUBLIC_API_URL=https://affiliate-api-ti9a.onrender.com
 ```
 
 ### Security Best Practices
@@ -398,8 +410,8 @@ Access to fetch blocked by CORS policy
 
 **Fixes:**
 - Set `CORS_ORIGIN` in API service to exact web URL
-- No trailing slash: `https://affiliate-web.onrender.com` ✅
-- Not: `https://affiliate-web.onrender.com/` ❌
+- No trailing slash: `https://affiliate-web-96ne.onrender.com` ✅
+- Not: `https://affiliate-web-96ne.onrender.com/` ❌
 - Restart API service after changing
 
 #### 6. API Health Check Fails
@@ -428,6 +440,33 @@ Build exceeded 15 minute timeout
 - Use Bun for faster builds (already configured)
 - Consider upgrading Render plan
 
+#### 8. NEXT_PUBLIC_API_URL is Undefined
+
+**Error:**
+```
+process.env.NEXT_PUBLIC_API_URL returns undefined
+API calls fail with localhost:3001 or network errors
+```
+
+**Root Cause:**
+Next.js requires `NEXT_PUBLIC_*` variables at **BUILD TIME**, not runtime. Render injects environment variables at runtime, so they're not baked into the JavaScript bundle.
+
+**Fixes:**
+1. Go to Render Dashboard → `affiliate-web` service → **Settings**
+2. Under **Docker** section, find **Docker Build Command**
+3. Add: `--build-arg NEXT_PUBLIC_API_URL=https://affiliate-api-ti9a.onrender.com`
+4. Save and trigger manual deploy
+5. Verify in browser DevTools → Network tab that API calls go to correct URL
+
+**Alternative (if build args don't work):**
+Use hardcoded production URL with fallback:
+```typescript
+const API_URL = process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')
+    ? 'https://affiliate-api-ti9a.onrender.com'
+    : 'http://localhost:3001');
+```
+
 ### Checking Logs
 
 **Render Dashboard:**
@@ -449,7 +488,7 @@ Build exceeded 15 minute timeout
 
 **API Health Endpoint:**
 ```bash
-curl https://affiliate-api.onrender.com/api/health
+curl https://affiliate-api-ti9a.onrender.com/api/health
 ```
 
 **Monitor:**
