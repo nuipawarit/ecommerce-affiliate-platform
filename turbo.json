@@ -27,7 +27,7 @@
       "dependsOn": ["^lint"]
     },
     "type-check": {
-      "dependsOn": ["^type-check"]
+      "dependsOn": ["^type-check", "^db:generate"]
     },
     "test": {
       "dependsOn": ["^build"],
