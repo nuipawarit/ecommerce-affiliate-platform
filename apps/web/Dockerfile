@@ -28,6 +28,9 @@ COPY apps/web ./apps/web
 COPY packages ./packages
 COPY package.json bun.lock turbo.json ./
 
+# Install OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl
+
 # Set placeholder DATABASE_URL for Prisma generation (real URL injected at runtime)
 ENV DATABASE_URL="postgresql://placeholder:placeholder@placeholder:5432/placeholder"
 
