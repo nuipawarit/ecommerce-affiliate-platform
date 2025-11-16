@@ -15,6 +15,7 @@ services:
   - type: keyvalue
     name: affiliate-redis
     plan: free
+    ipAllowList: []
     maxmemoryPolicy: allkeys-lru
     region: oregon
 
