@@ -1,23 +1,13 @@
 import type { Campaign, CampaignProduct } from './base';
 import { CampaignStatus } from './base';
+import type { ProductWithOffers } from './product';
 
 export { CampaignStatus };
 export type { Campaign, CampaignProduct };
 
 export interface CampaignWithRelations extends Campaign {
   campaignProducts?: Array<{
-    product: {
-      id: string;
-      title: string;
-      imageUrl: string;
-      offers?: Array<{
-        id: string;
-        marketplace: "LAZADA" | "SHOPEE";
-        storeName: string;
-        price: number;
-        url: string;
-      }>;
-    };
+    product: ProductWithOffers;
   }>;
   links?: Array<{
     id: string;

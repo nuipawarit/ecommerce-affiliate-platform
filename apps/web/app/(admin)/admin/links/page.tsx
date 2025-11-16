@@ -36,7 +36,7 @@ export default async function LinksPage() {
   const topPerformingLink = links.length > 0
     ? links.reduce((top, link) => {
         const clicks = link._count?.clicks ?? 0;
-        const topClicks = top._count?.clicks ?? 0;
+        const topClicks = top?._count?.clicks ?? 0;
         return clicks > topClicks ? link : top;
       }, links[0])
     : null;

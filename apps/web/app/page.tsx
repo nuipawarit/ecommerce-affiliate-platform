@@ -106,7 +106,9 @@ export default async function HomePage() {
           <EmptyState />
         ) : (
           <>
-            <FeaturedCampaignSection campaign={featuredCampaign} />
+            {featuredCampaign && (
+              <FeaturedCampaignSection campaign={featuredCampaign} />
+            )}
 
             {otherCampaigns.map((campaign) => (
               <CampaignSection key={campaign.id} campaign={campaign} />
