@@ -28,6 +28,9 @@ COPY apps/web ./apps/web
 COPY packages ./packages
 COPY package.json bun.lock turbo.json ./
 
+# Generate Prisma client
+RUN cd packages/database && bun run db:generate
+
 # Build Next.js with Bun
 WORKDIR /app/apps/web
 RUN bun run build
